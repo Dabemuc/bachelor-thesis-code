@@ -2,6 +2,6 @@
 name: resnet18_fp32
 model: resnet18
 precision: fp32
-subset: val_1000_seed0.txt
+subset: imagenette_val_1000_seed0.txt
 normalize_on_chip: false          # PyTorch bekommt normalisierte float32-Eingaben
 save_features: true

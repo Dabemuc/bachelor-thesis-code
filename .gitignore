@@ -23,3 +23,6 @@ results/**/*.png
 .DS_Store
 .idea/
 .vscode/
+
+# Hailo-DFC-Wheel: proprietär, nicht ins (GitHub-)Repo
+docker/*.whl

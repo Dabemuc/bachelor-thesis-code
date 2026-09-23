@@ -37,7 +37,11 @@ class ExperimentConfig:
     # True: Normalisierung (mean/std) wird per Model Script ins HEF gelegt,
     # der Host füttert uint8 (0–255). False: Host normalisiert, HEF bekommt float.
     normalize_on_chip: bool = True
+    calib_subset: str | None = None  # Pfad relativ zu data/subsets/ – DISJUNKT zu `subset`
     calib_size: int = 1024
+    # DFC-Optimierungsstufe (model_optimization_flavor). None = DFC-Default.
+    # Methodisch relevant: bestimmt die Quantisierungsalgorithmen → explizit festhalten!
+    optimization_level: int | None = None
     warmup_iters: int = 50
     repeats: int = 1                 # Wiederholungen des Subset-Durchlaufs (Hailo ist nicht deterministisch)
     save_features: bool = True       # Feature-Maps der CAM-Schicht mitschreiben
@@ -46,6 +50,10 @@ class ExperimentConfig:
     @property
     def subset_path(self) -> Path:
         return DATA_DIR / "subsets" / self.subset
+
+    @property
+    def calib_subset_path(self) -> Path | None:
+        return DATA_DIR / "subsets" / self.calib_subset if self.calib_subset else None
 
     @property
     def onnx_path(self) -> Path | None:

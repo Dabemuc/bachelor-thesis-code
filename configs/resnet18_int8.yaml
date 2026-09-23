@@ -2,18 +2,23 @@
 name: resnet18_int8
 model: resnet18
 precision: int8
-subset: val_1000_seed0.txt        # data/subsets/ – für ALLE Läufe identisch
+subset: imagenette_val_1000_seed0.txt        # AP0; für die Arbeit → ImageNet-Val
+calib_subset: imagenette_calib_1024_seed1.txt # aus Imagenette-TRAIN → disjunkt
 onnx: onnx/resnet18.onnx
 hef: resnet18_int8/resnet18.hef   # wird von thesis-compile erzeugt
 
-# Mit `thesis-onnx-nodes artifacts/onnx/resnet18.onnx` die echten Namen nachsehen!
-# Erwartet: letztes ReLU in layer4 (Feature-Map 7×7×512) + Gemm (Logits).
+# Aus thesis-onnx-nodes (torchvision ResNet18, TorchScript-Exporter, opset 13), 23.09.2026:
+#   /layer4/layer4.1/relu_1/Relu → Ausgang von layer4 = 7×7×512 Feature-Map für Eigen-CAM.
+#     Entspricht exakt dem Forward-Hook auf model.layer4 in reference/fp32_run.py.
+#   /fc/Gemm → Logits (1000).
+# Bei anderem torch-/Exporter-Stand können sich die Namen ändern → neu nachsehen.
 end_node_names:
-  - "TODO_layer4_last_relu"
-  - "TODO_fc_gemm"
+  - "/layer4/layer4.1/relu_1/Relu"
+  - "/fc/Gemm"
 
 normalize_on_chip: true           # Host füttert uint8; mean/std liegen im HEF
 calib_size: 1024
+optimization_level: null          # AP0: DFC-Default; vor den echten Messungen festlegen
 warmup_iters: 50
 repeats: 3                        # Hailo ist lauf-zu-lauf nicht deterministisch
 save_features: true

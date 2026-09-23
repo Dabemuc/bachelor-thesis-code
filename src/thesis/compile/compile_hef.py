@@ -24,12 +24,16 @@ Grundlage für Emulator-Läufe (SDK_QUANTIZED) und Layer-Analysen (TF4).
 from __future__ import annotations
 
 import argparse
+import dataclasses
+import json
 import sys
+from datetime import datetime
 
 import numpy as np
 
-from ..common.config import ARTIFACTS_DIR, DATA_DIR, load_config
+from ..common.config import ARTIFACTS_DIR, load_config
 from ..common.preprocess import load_uint8, normalize, onchip_normalization_params
+from ..common.runmeta import git_state, package_versions
 from ..common.subset import read_subset
 
 
@@ -45,8 +49,6 @@ def build_calib_set(subset_file, n: int, normalize_on_chip: bool) -> np.ndarray:
 def main() -> None:
     ap = argparse.ArgumentParser(description="ONNX → HEF (Hailo-8)")
     ap.add_argument("config")
-    ap.add_argument("--calib-subset", default="calib_1024_seed1.txt",
-                    help="Subset-Datei in data/subsets/ – DISJUNKT zum Evaluations-Subset!")
     ap.add_argument("--hw-arch", default="hailo8")
     args = ap.parse_args()
 
@@ -74,16 +76,31 @@ def main() -> None:
         mean, std = onchip_normalization_params()
         script_lines.append(f"normalization1 = normalization({mean}, {std})")
     # Hier später Quantisierungs-Optionen je Präzisionsstufe ergänzen (siehe README).
+    if cfg.optimization_level is not None:
+        script_lines.append(f"model_optimization_flavor(optimization_level={cfg.optimization_level})")
     if script_lines:
         runner.load_model_script("\n".join(script_lines) + "\n")
 
-    calib = build_calib_set(DATA_DIR / "subsets" / args.calib_subset, cfg.calib_size, cfg.normalize_on_chip)
+    if cfg.calib_subset_path is None or not cfg.calib_subset_path.exists():
+        sys.exit(f"Kalibrier-Subset fehlt: {cfg.calib_subset_path} (calib_subset in der Config setzen)")
+    if cfg.calib_subset == cfg.subset:
+        sys.exit("calib_subset == subset – Kalibrierung auf den Evaluationsbildern ist unzulässig.")
+    calib = build_calib_set(cfg.calib_subset_path, cfg.calib_size, cfg.normalize_on_chip)
     runner.optimize(calib)
     runner.save_har(str(out_dir / f"{cfg.model}_quantized.har"))
 
     hef = runner.compile()
     hef_path = out_dir / f"{cfg.model}.hef"
     hef_path.write_bytes(hef)
+    (out_dir / "compile_meta.json").write_text(json.dumps({
+        "created": datetime.now().isoformat(timespec="seconds"),
+        "hw_arch": args.hw_arch,
+        "model_script": script_lines,
+        "calib_n": int(calib.shape[0]),
+        "git": git_state(),
+        "packages": package_versions(),
+        "config": dataclasses.asdict(cfg),
+    }, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"HEF → {hef_path}   (in der Config als hef: {cfg.name}/{cfg.model}.hef eintragen)")
 
 

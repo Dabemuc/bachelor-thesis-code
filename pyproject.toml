@@ -39,6 +39,7 @@ thesis-export-onnx = "thesis.reference.export_onnx:main"
 thesis-onnx-nodes = "thesis.reference.export_onnx:list_nodes_main"
 thesis-compile = "thesis.compile.compile_hef:main"
 thesis-make-subset = "thesis.common.subset:main"
+thesis-fetch-imagenette = "thesis.common.imagenette:main"
 
 [build-system]
 requires = ["hatchling"]
