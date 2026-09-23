@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.hef binary
+*.onnx binary
+*.whl binary
