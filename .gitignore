@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# Große / binäre Artefakte – NICHT ins Git (per rsync verteilen, extern sichern)
+artifacts/
+data/images/
+data/calib/
+*.onnx
+*.har
+*.hef
+*.npy
+*.npz
+
+# Rohdaten der Messläufe: Metadaten + CSV werden committet, Tensoren nicht (s. o.)
+results/**/*.png
+
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/
+
+# Hailo-DFC-Wheel: proprietär, nicht ins (GitHub-)Repo
+docker/*.whl
+
+# DFC-Logs
+*.log
