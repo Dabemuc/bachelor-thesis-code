@@ -43,7 +43,7 @@ Spark (PyTorch FP32) ─────────── results/ ─────�
 
 ```bash
 # auf dem Pi
-git clone <repo> ~/thesis-code && cd ~/thesis-code
+git clone git@github.com:Dabemuc/bachelor-thesis-code.git ~/bachelor-thesis-code && cd ~/bachelor-thesis-code
 scripts/pi_setup.sh            # apt install hailo-all → reboot
 scripts/pi_setup.sh verify     # muss HAILO8 melden (nicht HAILO8L)
 

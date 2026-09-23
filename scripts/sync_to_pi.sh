@@ -8,7 +8,7 @@
 set -euo pipefail
 
 PI_HOST="${PI_HOST:-pi5}"                 # Host aus ~/.ssh/config
-PI_DIR="${PI_DIR:-~/thesis-code}"
+PI_DIR="${PI_DIR:-~/bachelor-thesis-code}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 case "${1:-}" in
