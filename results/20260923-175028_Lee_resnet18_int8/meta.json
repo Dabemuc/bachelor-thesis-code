@@ -1,0 +1,41 @@
+{
+  "started": "2026-09-23T17:50:28",
+  "host": "Lee",
+  "platform": "Linux-6.18.50+rpt-rpi-2712-aarch64-with-glibc2.41",
+  "machine": "aarch64",
+  "python": "3.13.5",
+  "git": {
+    "commit": "034d56b214b3b3801ace20f30fb9e65e2b38908b",
+    "dirty": false
+  },
+  "packages": {
+    "numpy": "2.5.3",
+    "torch": null,
+    "onnx": null,
+    "hailort": "4.23.0",
+    "hailo-dataflow-compiler": null,
+    "hailort (dpkg)": "4.23.0"
+  },
+  "config": {
+    "name": "resnet18_int8",
+    "model": "resnet18",
+    "precision": "int8",
+    "subset": "imagenette_val_1000_seed0.txt",
+    "onnx": "onnx/resnet18.onnx",
+    "hef": "resnet18_int8/resnet18.hef",
+    "end_node_names": [
+      "/layer4/layer4.1/relu_1/Relu",
+      "/fc/Gemm"
+    ],
+    "normalize_on_chip": true,
+    "calib_subset": "imagenette_calib_1024_seed1.txt",
+    "calib_size": 1024,
+    "optimization_level": null,
+    "warmup_iters": 50,
+    "repeats": 3,
+    "save_features": true,
+    "notes": ""
+  },
+  "n_images": 20,
+  "role": "edge"
+}

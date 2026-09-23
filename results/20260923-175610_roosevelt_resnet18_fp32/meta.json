@@ -1,0 +1,38 @@
+{
+  "started": "2026-09-23T17:56:10",
+  "host": "roosevelt",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "machine": "arm64",
+  "python": "3.12.8",
+  "git": {
+    "commit": "511aa3f71ff4c9a22701a891916921e3694f0083",
+    "dirty": false
+  },
+  "packages": {
+    "numpy": "2.5.3",
+    "torch": "2.14.0",
+    "onnx": "1.23.0",
+    "hailort": null,
+    "hailo-dataflow-compiler": null
+  },
+  "config": {
+    "name": "resnet18_fp32",
+    "model": "resnet18",
+    "precision": "fp32",
+    "subset": "imagenette_val_1000_seed0.txt",
+    "onnx": null,
+    "hef": null,
+    "end_node_names": [],
+    "normalize_on_chip": false,
+    "calib_subset": null,
+    "calib_size": 1024,
+    "optimization_level": null,
+    "warmup_iters": 50,
+    "repeats": 1,
+    "save_features": true,
+    "notes": ""
+  },
+  "n_images": 20,
+  "role": "reference",
+  "device": "cpu"
+}
