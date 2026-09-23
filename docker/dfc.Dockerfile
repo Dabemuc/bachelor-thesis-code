@@ -31,6 +31,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN python3.10 -m venv /opt/dfc
 ENV PATH=/opt/dfc/bin:$PATH
 
+ENV USER=root
+
 COPY hailo_dataflow_compiler-*.whl /tmp/
 RUN pip install --upgrade pip && pip install /tmp/hailo_dataflow_compiler-*.whl && rm /tmp/*.whl
 
