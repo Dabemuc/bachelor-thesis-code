@@ -1,0 +1,52 @@
+[project]
+name = "thesis"
+version = "0.1.0"
+description = "Bachelorarbeit: Einfluss hardware-realer Quantisierung (Hailo-8) auf CAM-Erklärungen"
+readme = "README.md"
+# 3.10: DFC-Container (Python 3.8–3.10) · 3.13: Raspberry Pi OS Trixie
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "pillow>=10.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# Pi 5: hailo_platform kommt NICHT von PyPI, sondern per apt (python3-hailort).
+# Das venv muss deshalb mit --system-site-packages angelegt werden (siehe README).
+edge = []
+# DGX Spark / beliebiger Rechner mit PyTorch
+reference = [
+    "torch>=2.2",
+    "torchvision>=0.17",
+    "onnx>=1.15",
+]
+# x86-Desktop im DFC-Container: hailo_sdk_client wird aus dem Wheel der
+# Hailo Developer Zone installiert, nicht von PyPI (siehe docker/).
+compile = [
+    "onnx>=1.15",
+]
+analysis = [
+    "matplotlib>=3.8",
+]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+thesis-edge-run = "thesis.edge.runner:main"
+thesis-export-onnx = "thesis.reference.export_onnx:main"
+thesis-onnx-nodes = "thesis.reference.export_onnx:list_nodes_main"
+thesis-compile = "thesis.compile.compile_hef:main"
+thesis-make-subset = "thesis.common.subset:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/thesis"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
