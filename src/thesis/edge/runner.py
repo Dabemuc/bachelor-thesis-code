@@ -35,7 +35,7 @@ import numpy as np
 
 from ..common.config import load_config
 from ..common.preprocess import load_uint8, normalize
-from ..common.runmeta import new_run_dir, write_meta
+from ..common.runmeta import hef_provenance, new_run_dir, write_meta
 from ..common.subset import read_subset
 from . import telemetry
 
@@ -101,7 +101,7 @@ def main() -> None:
 
     hp = _import_hailo()
     run_dir = new_run_dir(cfg)
-    write_meta(run_dir, cfg, extra={"n_images": len(items), "role": "edge"})
+    write_meta(run_dir, cfg, extra={"n_images": len(items), "role": "edge", "hef": hef_provenance(cfg.hef_path)})
 
     hef = hp.HEF(str(cfg.hef_path))
     with hp.VDevice() as target:

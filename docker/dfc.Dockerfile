@@ -1,8 +1,11 @@
-# Hailo Dataflow Compiler 3.33.0 (passend zu HailoRT 4.23.0 auf dem Pi) – nur x86_64.
+# Hailo Dataflow Compiler 3.33.1 (läuft mit HailoRT 4.23.0 auf dem Pi, geprüft 06.10.2026) – nur x86_64.
+# Bis 06.10.2026: 3.33.0. 3.33.1 behebt laut Changelog einen Bug, der die GPU-Nutzung in der
+# Optimierung verhinderte; bei Optimierungsstufe 0 sind die Ausgaben auf dem Chip bitgleich zu 3.33.0.
 #
 # 1) Wheel aus der Hailo Developer Zone laden (Login; Plattform "Hailo-8/8L" wählen!)
 #    und hierher legen:
-#        docker/hailo_dataflow_compiler-3.33.0-py3-none-linux_x86_64.whl
+#        docker/hailo_dataflow_compiler-3.33.1-py3-none-linux_x86_64.whl
+#    ⚠️ Nur EIN Wheel in docker/ – COPY nimmt hailo_dataflow_compiler-*.whl, zwei Versionen brechen den Build.
 #
 # 2) Build (aus dem Repo-Root):
 #        docker build -f docker/dfc.Dockerfile -t thesis-dfc docker/
@@ -12,12 +15,14 @@
 #        docker run --rm -it --gpus all -v "$PWD":/work -w /work thesis-dfc     # mit GPU
 #    im Container einmalig:  pip install -e ".[compile]"
 #
-# GPU: ohne GPU fällt der DFC laut Community-Berichten auf Optimierungsstufe 0
-# zurück (nur einfache Kalibrierung). Für AP0 reicht das. Für die Messungen der Arbeit
-# die Stufe bewusst wählen, in der Config festhalten und im Methodikteil nennen.
+# GPU: ohne GPU setzt der DFC nur den DEFAULT auf Optimierungsstufe 0 (Equalization +
+# Kalibrierung). Explizit gesetzte Stufen 1–4 laufen auch auf der CPU, nur langsam
+# (Quelle: Quelltext DFC 3.33, mo_config.py / quantize.py; Details im Vault:
+# „DFC 3.33.0 Stellschrauben“). Für die Messungen der Arbeit die Stufe bewusst wählen,
+# in der Config festhalten und im Methodikteil nennen.
 # Die GPU-Variante braucht auf dem Host den NVIDIA-Treiber + nvidia-container-toolkit
 # und im Image passende CUDA/cuDNN-Bibliotheken → BASE_IMAGE dann auf ein
-# nvidia/cuda-…-cudnn-…-ubuntu22.04-Image setzen (Version gegen den DFC-3.33-User-Guide prüfen).
+# nvidia/cuda-…-cudnn-…-ubuntu22.04-Image setzen (Version gegen die DFC-3.33-Doku prüfen).
 
 ARG BASE_IMAGE=ubuntu:22.04
 FROM ${BASE_IMAGE}

@@ -9,6 +9,7 @@ Rohdaten in diesem Ordner werden nachträglich nie verändert.
 from __future__ import annotations
 
 import dataclasses
+import hashlib
 import json
 import platform
 import socket
@@ -47,6 +48,37 @@ def package_versions(names: tuple[str, ...] = ("numpy", "torch", "onnx", "hailor
     if dpkg:
         out["hailort (dpkg)"] = dpkg
     return out
+
+
+def sha256_file(path: Path | str) -> str:
+    """SHA-256 einer Datei (z. B. ONNX, HEF) – macht Artefakte eindeutig zuordenbar."""
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def hef_provenance(hef_path: Path | str) -> dict:
+    """Prüfsumme des HEF + (falls vorhanden) die compile_meta.json daneben.
+
+    Damit steht in jedem Edge-Lauf, welches HEF mit welcher DFC-Version und welchem
+    Model Script lief – auch wenn der Pi selbst keinen DFC hat.
+    """
+    hef_path = Path(hef_path)
+    info: dict = {"path": str(hef_path), "sha256": sha256_file(hef_path)}
+    cmeta = hef_path.parent / "compile_meta.json"
+    if cmeta.exists():
+        c = json.loads(cmeta.read_text(encoding="utf-8"))
+        info["compile_meta"] = {k: c.get(k) for k in (
+            "created", "hw_arch", "model_script", "calib_n", "onnx_sha256", "hef_sha256", "git")}
+        info["compile_meta"]["dfc_version"] = (c.get("packages") or {}).get("hailo-dataflow-compiler")
+        if c.get("hef_sha256") and c["hef_sha256"] != info["sha256"]:
+            print("⚠️  HEF-Prüfsumme passt nicht zur compile_meta.json daneben – veraltete Metadaten?", file=sys.stderr)
+    else:
+        info["compile_meta"] = None
+        print(f"⚠️  Keine compile_meta.json neben {hef_path} – DFC-Version des HEF unbekannt.", file=sys.stderr)
+    return info
 
 
 def new_run_dir(cfg: ExperimentConfig, tag: str = "") -> Path:

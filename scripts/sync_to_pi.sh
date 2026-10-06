@@ -13,7 +13,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 case "${1:-}" in
   push)
-    rsync -avh --progress --include='*/' --include='*.hef' --exclude='*' \
+    rsync -avh --progress --include='*/' --include='*.hef' --include='compile_meta.json' --exclude='*' \
           "$ROOT/artifacts/" "$PI_HOST:$PI_DIR/artifacts/"
     rsync -avh --progress "$ROOT/data/images/" "$PI_HOST:$PI_DIR/data/images/"
     ;;

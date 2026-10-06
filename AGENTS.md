@@ -15,7 +15,7 @@ Code zur Bachelorarbeit von Daniel: Einfluss hardware-realer Quantisierung (Hail
 ## Feste Randbedingungen
 
 - **Rechner-Rollen:** Windows-PC (x86) kompiliert mit dem Hailo DFC in Podman (`docker/dfc.Dockerfile`) · Pi „Lee“ misst mit HailoRT (`thesis.edge`) · Mac bzw. DGX Spark: FP32-Referenz und Auswertung (`thesis.reference`, `thesis.analysis`).
-- **Versionen:** DFC 3.33.0 ↔ HailoRT 4.23.0 ↔ Model Zoo v2.17. Der DFC läuft nur auf x86_64, nicht auf ARM.
+- **Versionen:** DFC 3.33.1 (seit 06.10.2026, vorher 3.33.0) ↔ HailoRT 4.23.0 ↔ Model Zoo v2.17. Der DFC läuft nur auf x86_64, nicht auf ARM.
 - **Validität:** ein gemeinsames Preprocessing (`thesis/common/preprocess.py`) für alle Rechner. Feste Bildlisten in `data/subsets/` werden nie geändert, Kalibrierdaten sind disjunkt zur Eval-Liste. Auf dem Pi nur Rohdaten schreiben, Auswertung woanders. Code per `git pull` auf den Pi, jeder Lauf protokolliert Commit + dirty-Flag.
 - **Nicht ins Git:** `artifacts/` (ONNX, HEF, HAR), `data/images/`, `*.npz`/`*.npy`, `docker/*.whl` (proprietäres DFC-Wheel), `*.log`.
 - Zeilenenden LF (`.gitattributes`), Skripte in `scripts/` sind ausführbar.

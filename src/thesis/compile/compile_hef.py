@@ -33,7 +33,7 @@ import numpy as np
 
 from ..common.config import ARTIFACTS_DIR, load_config
 from ..common.preprocess import load_uint8, normalize, onchip_normalization_params
-from ..common.runmeta import git_state, package_versions
+from ..common.runmeta import git_state, package_versions, sha256_file
 from ..common.subset import read_subset
 
 
@@ -97,6 +97,8 @@ def main() -> None:
         "hw_arch": args.hw_arch,
         "model_script": script_lines,
         "calib_n": int(calib.shape[0]),
+        "onnx_sha256": sha256_file(cfg.onnx_path),
+        "hef_sha256": sha256_file(hef_path),
         "git": git_state(),
         "packages": package_versions(),
         "config": dataclasses.asdict(cfg),
