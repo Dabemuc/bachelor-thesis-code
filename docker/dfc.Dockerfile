@@ -18,7 +18,7 @@
 # GPU: ohne GPU setzt der DFC nur den DEFAULT auf Optimierungsstufe 0 (Equalization +
 # Kalibrierung). Explizit gesetzte Stufen 1–4 laufen auch auf der CPU, nur langsam
 # (Quelle: Quelltext DFC 3.33, mo_config.py / quantize.py; Details im Vault:
-# „DFC 3.33.0 Stellschrauben“). Für die Messungen der Arbeit die Stufe bewusst wählen,
+# „DFC 3.33.1 Stellschrauben“). Für die Messungen der Arbeit die Stufe bewusst wählen,
 # in der Config festhalten und im Methodikteil nennen.
 # GPU-Variante (geprüft 06.10.2026, RTX 3070, Windows + Podman/WSL2):
 #   Host: aktueller NVIDIA-Treiber (Windows) + nvidia-container-toolkit in der Podman-Machine (CDI-Spec

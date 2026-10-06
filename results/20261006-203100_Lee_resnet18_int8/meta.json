@@ -1,0 +1,61 @@
+{
+  "started": "2026-10-06T20:31:00",
+  "host": "Lee",
+  "platform": "Linux-6.18.50+rpt-rpi-2712-aarch64-with-glibc2.41",
+  "machine": "aarch64",
+  "python": "3.13.5",
+  "git": {
+    "commit": "af800e61074f8a34c12c5626b903c7d5334fefff",
+    "dirty": false,
+    "dirty_files": []
+  },
+  "packages": {
+    "numpy": "2.5.3",
+    "torch": null,
+    "onnx": null,
+    "hailort": "4.23.0",
+    "hailo-dataflow-compiler": null,
+    "hailort (dpkg)": "4.23.0"
+  },
+  "config": {
+    "name": "resnet18_int8",
+    "model": "resnet18",
+    "precision": "int8",
+    "subset": "imagenette_val_1000_seed0.txt",
+    "onnx": "onnx/resnet18.onnx",
+    "hef": "resnet18_int8/resnet18.hef",
+    "end_node_names": [
+      "/layer4/layer4.1/relu_1/Relu",
+      "/fc/Gemm"
+    ],
+    "normalize_on_chip": true,
+    "calib_subset": "imagenette_calib_1024_seed1.txt",
+    "calib_size": 1024,
+    "optimization_level": null,
+    "warmup_iters": 50,
+    "repeats": 3,
+    "save_features": true,
+    "notes": ""
+  },
+  "n_images": 20,
+  "role": "edge",
+  "hef": {
+    "path": "/home/pi/bachelor-thesis-code/artifacts/resnet18_int8/resnet18.hef",
+    "sha256": "79a621310b9fe15d2cd6d595d694c815613823c11e799111b801e37993811b43",
+    "compile_meta": {
+      "created": "2026-10-06T18:09:41",
+      "hw_arch": "hailo8",
+      "model_script": [
+        "normalization1 = normalization([123.675, 116.28, 103.53], [58.395, 57.120000000000005, 57.375])"
+      ],
+      "calib_n": 1024,
+      "onnx_sha256": "1cfe2538e1da6dc19ad3b94dec8248b8b06591274018a96d17a29c4877329add",
+      "hef_sha256": "79a621310b9fe15d2cd6d595d694c815613823c11e799111b801e37993811b43",
+      "git": {
+        "commit": "5dc80ab1d857961f11d5c10d43c4006458454472",
+        "dirty": true
+      },
+      "dfc_version": "3.33.1"
+    }
+  }
+}
