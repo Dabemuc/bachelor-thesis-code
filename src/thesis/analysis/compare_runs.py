@@ -65,7 +65,7 @@ def main() -> None:
         raise SystemExit("Keine gemeinsamen image_ids – gleiche Subset-Datei verwendet?")
     out = args.ref_run / f"compare_{args.q_run.name}.csv"
     with open(out, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w = csv.DictWriter(f, fieldnames=list(rows[0]), lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
 

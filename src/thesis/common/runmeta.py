@@ -30,9 +30,18 @@ def _run(cmd: list[str]) -> str | None:
 
 
 def git_state() -> dict:
+    """Commit + ob der Code vom Commit abweicht.
+
+    Ungetrackte Lauf-Ordner unter ``results/`` zählen NICHT als „dirty“: Sie entstehen auf dem
+    Pi bei jedem Lauf und werden erst auf dem Mac committet. Geänderte oder neue Dateien
+    außerhalb von ``results/`` zählen weiterhin.
+    """
+    porcelain = _run(["git", "status", "--porcelain"]) or ""
+    changes = [ln for ln in porcelain.splitlines() if ln.strip() and not ln[3:].startswith("results/")]
     return {
         "commit": _run(["git", "rev-parse", "HEAD"]),
-        "dirty": bool(_run(["git", "status", "--porcelain"])),
+        "dirty": bool(changes),
+        "dirty_files": changes[:20],
     }
 
 

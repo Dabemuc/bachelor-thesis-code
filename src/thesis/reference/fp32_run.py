@@ -56,7 +56,7 @@ def main() -> None:
 
     ids, logits_all, feats_all = [], [], []
     with torch.no_grad(), open(run_dir / "predictions.csv", "w", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")
         w.writerow(["image_id", "label", "top1", "top5"])
         for it in items:
             x = torch.from_numpy(to_nchw_batch(normalize(load_uint8(it.path)))).to(args.device)

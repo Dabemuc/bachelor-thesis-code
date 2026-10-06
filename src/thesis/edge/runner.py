@@ -63,7 +63,7 @@ class TelemetryLogger(threading.Thread):
             while not self._halt.is_set():
                 row = telemetry.sample(self.vdevice).as_row()
                 if w is None:
-                    w = csv.DictWriter(f, fieldnames=list(row))
+                    w = csv.DictWriter(f, fieldnames=list(row), lineterminator="\n")
                     w.writeheader()
                 w.writerow(row)
                 f.flush()
@@ -128,7 +128,7 @@ def main() -> None:
                 pipe.infer({input_name: dummy})
 
             with open(run_dir / "predictions.csv", "w", newline="") as f:
-                w = csv.writer(f)
+                w = csv.writer(f, lineterminator="\n")
                 w.writerow(["image_id", "label", "top1", "top5", "latency_ms", "repeat"])
                 for rep in range(cfg.repeats):
                     for it in items:

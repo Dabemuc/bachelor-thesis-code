@@ -75,7 +75,7 @@ scripts/pi_bench_mode.sh
 .venv/bin/thesis-edge-run configs/resnet18_int8.yaml
 
 # zurück + vergleichen
-scripts/sync_to_pi.sh pull
+scripts/sync_to_pi.sh pull     # verschiebt neue Läufe vom Pi hierher (Pi bleibt sauber für git pull)
 python -m thesis.analysis.compare_runs results/<fp32-run> results/<edge-run>
 ```
 
