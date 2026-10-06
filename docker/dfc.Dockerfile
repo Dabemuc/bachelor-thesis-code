@@ -12,7 +12,7 @@
 #
 # 3) Start – Repo wird gemountet, Ergebnisse landen direkt in artifacts/:
 #        docker run --rm -it -v "$PWD":/work -w /work thesis-dfc                # nur CPU
-#        docker run --rm -it --gpus all -v "$PWD":/work -w /work thesis-dfc     # mit GPU
+#        (mit GPU: siehe unten, Podman nutzt --device nvidia.com/gpu=all)
 #    im Container einmalig:  pip install -e ".[compile]"
 #
 # GPU: ohne GPU setzt der DFC nur den DEFAULT auf Optimierungsstufe 0 (Equalization +
@@ -20,9 +20,12 @@
 # (Quelle: Quelltext DFC 3.33, mo_config.py / quantize.py; Details im Vault:
 # „DFC 3.33.0 Stellschrauben“). Für die Messungen der Arbeit die Stufe bewusst wählen,
 # in der Config festhalten und im Methodikteil nennen.
-# Die GPU-Variante braucht auf dem Host den NVIDIA-Treiber + nvidia-container-toolkit
-# und im Image passende CUDA/cuDNN-Bibliotheken → BASE_IMAGE dann auf ein
-# nvidia/cuda-…-cudnn-…-ubuntu22.04-Image setzen (Version gegen die DFC-3.33-Doku prüfen).
+# GPU-Variante (DFC 3.33 bringt tensorflow==2.18.0 mit → CUDA 12.5 / cuDNN 9 laut TF-Build-Tabelle):
+#   Host: aktueller NVIDIA-Treiber (Windows) + nvidia-container-toolkit in der Podman-Machine (CDI)
+#   podman build -f docker/dfc.Dockerfile -t thesis-dfc:3.33.1-gpu \
+#       --build-arg BASE_IMAGE=nvidia/cuda:12.5.1-cudnn-runtime-ubuntu22.04 docker/
+#   podman run --rm -it --device nvidia.com/gpu=all -v "${PWD}:/work" -w /work thesis-dfc:3.33.1-gpu
+#   Check im Container: python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
 
 ARG BASE_IMAGE=ubuntu:22.04
 FROM ${BASE_IMAGE}
