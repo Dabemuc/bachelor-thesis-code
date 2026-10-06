@@ -42,6 +42,12 @@ class ExperimentConfig:
     # DFC-Optimierungsstufe (model_optimization_flavor). None = DFC-Default.
     # Methodisch relevant: bestimmt die Quantisierungsalgorithmen → explizit festhalten!
     optimization_level: int | None = None
+    # Zusätzliche Model-Script-Zeilen (DFC .alls-Syntax), werden nach Normalisierung und
+    # optimization_level angehängt. Für Probe-Läufe und Präzisionsstufen, z. B.
+    #   - "model_optimization_config(calibration, calibset_size=1024)"
+    #   - "model_optimization_config(compression_params, auto_4bit_weights_ratio=0.6)"
+    #   - "performance_param(compiler_optimization_level=max)"
+    model_script: list[str] = field(default_factory=list)
     warmup_iters: int = 50
     repeats: int = 1                 # Wiederholungen des Subset-Durchlaufs (Hailo ist nicht deterministisch)
     save_features: bool = True       # Feature-Maps der CAM-Schicht mitschreiben

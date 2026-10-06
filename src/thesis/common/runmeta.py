@@ -80,7 +80,7 @@ def hef_provenance(hef_path: Path | str) -> dict:
     if cmeta.exists():
         c = json.loads(cmeta.read_text(encoding="utf-8"))
         info["compile_meta"] = {k: c.get(k) for k in (
-            "created", "hw_arch", "model_script", "calib_n", "onnx_sha256", "hef_sha256", "git")}
+            "created", "hw_arch", "model_script", "calib_n", "calib_array_n", "onnx_sha256", "hef_sha256", "git")}
         info["compile_meta"]["dfc_version"] = (c.get("packages") or {}).get("hailo-dataflow-compiler")
         if c.get("hef_sha256") and c["hef_sha256"] != info["sha256"]:
             print("⚠️  HEF-Prüfsumme passt nicht zur compile_meta.json daneben – veraltete Metadaten?", file=sys.stderr)

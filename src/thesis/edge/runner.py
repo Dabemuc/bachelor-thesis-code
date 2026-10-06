@@ -4,7 +4,7 @@ Schreibt NUR Rohdaten – keine Metriken, keine Plots (die kosten CPU und
 verfälschen die Latenz):
 
     results/<run>/meta.json         Git-Commit, Versionen, Config
-    results/<run>/predictions.csv   image_id, label, top1, top5, latency_ms, repeat
+    results/<run>/predictions.csv   image_id, label, top1, top5, latency_ms, repeat, out_sha1
     results/<run>/telemetry.csv     SoC-/Hailo-Temperatur, Drossel-Flags (1 Hz-ish)
     results/<run>/logits.npz        ids [N], logits [N, 1000]   (Reihenfolge = Subset)
     results/<run>/features.npz      ids [N], features [N, H, W, K] (falls 2. Ausgang im HEF)
@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import sys
 import threading
 import time
@@ -129,7 +130,7 @@ def main() -> None:
 
             with open(run_dir / "predictions.csv", "w", newline="") as f:
                 w = csv.writer(f, lineterminator="\n")
-                w.writerow(["image_id", "label", "top1", "top5", "latency_ms", "repeat"])
+                w.writerow(["image_id", "label", "top1", "top5", "latency_ms", "repeat", "out_sha1"])
                 for rep in range(cfg.repeats):
                     for it in items:
                         img = load_uint8(it.path)
@@ -139,7 +140,12 @@ def main() -> None:
                         dt_ms = (time.perf_counter_ns() - t0) / 1e6
                         logits, feats = _classify_outputs(out)
                         top5 = np.argsort(logits)[::-1][:5]
-                        w.writerow([it.image_id, it.label, int(top5[0]), " ".join(map(str, top5)), f"{dt_ms:.3f}", rep])
+                        # Prüfsumme der Rohausgaben → Lauf-zu-Lauf-Determinismus über alle Wiederholungen
+                        # prüfbar, ohne jede Wiederholung als Tensor zu speichern.
+                        h = hashlib.sha1(np.ascontiguousarray(logits).tobytes())
+                        if feats is not None:
+                            h.update(np.ascontiguousarray(feats).tobytes())
+                        w.writerow([it.image_id, it.label, int(top5[0]), " ".join(map(str, top5)), f"{dt_ms:.3f}", rep, h.hexdigest()])
                         if rep == 0:
                             ids.append(it.image_id)
                             logits_all.append(logits.astype(np.float32))

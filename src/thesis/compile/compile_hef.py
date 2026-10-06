@@ -78,6 +78,7 @@ def main() -> None:
     # Hier später Quantisierungs-Optionen je Präzisionsstufe ergänzen (siehe README).
     if cfg.optimization_level is not None:
         script_lines.append(f"model_optimization_flavor(optimization_level={cfg.optimization_level})")
+    script_lines.extend(cfg.model_script)
     if script_lines:
         runner.load_model_script("\n".join(script_lines) + "\n")
 
@@ -96,7 +97,9 @@ def main() -> None:
         "created": datetime.now().isoformat(timespec="seconds"),
         "hw_arch": args.hw_arch,
         "model_script": script_lines,
-        "calib_n": int(calib.shape[0]),
+        # Anzahl der an optimize() übergebenen Bilder. NICHT die Kalibriergröße des DFC:
+        # die steht in calibset_size (Default 64) bzw. im Model Script oben.
+        "calib_array_n": int(calib.shape[0]),
         "onnx_sha256": sha256_file(cfg.onnx_path),
         "hef_sha256": sha256_file(hef_path),
         "git": git_state(),
