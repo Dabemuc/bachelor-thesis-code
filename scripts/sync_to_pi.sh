@@ -3,7 +3,8 @@
 # Code kommt NICHT per rsync, sondern per `git pull` auf dem Pi – damit jeder
 # Messlauf einem Commit zugeordnet ist.
 #
-#   scripts/sync_to_pi.sh push    # artifacts/ + data/ → Pi
+#   scripts/sync_to_pi.sh push    # artifacts/ + Bilder (ohne ImageNet-Archive, ImageNet nur Eval-Liste) → Pi
+#   EVAL_N=48000 scripts/sync_to_pi.sh push   # mehr ImageNet-Eval-Bilder
 #   scripts/sync_to_pi.sh pull    # neue Pi:results/ → lokal VERSCHIEBEN (Pi bleibt git-sauber)
 set -euo pipefail
 
@@ -15,7 +16,11 @@ case "${1:-}" in
   push)
     rsync -avh --progress --include='*/' --include='*.hef' --include='compile_meta.json' --exclude='*' \
           "$ROOT/artifacts/" "$PI_HOST:$PI_DIR/artifacts/"
-    rsync -avh --progress "$ROOT/data/images/" "$PI_HOST:$PI_DIR/data/images/"
+    # Bilder: Archive nie, ImageNet nur die Bilder der Eval-Liste (EVAL_SUBSET, Default: erste
+    # 1000 Zeilen von imagenet_eval_48000.txt – reicht für Phase 1; N per EVAL_N erhöhen)
+    rsync -avh --progress --exclude='imagenet/' "$ROOT/data/images/" "$PI_HOST:$PI_DIR/data/images/"
+    "$ROOT/scripts/sync_subset_images.sh" "${EVAL_SUBSET:-imagenet_eval_48000.txt}" \
+          "$PI_HOST:$PI_DIR/data/images/" "${EVAL_N:-1000}"
     ;;
   pull)
     # Neue Lauf-Ergebnisse vom Pi auf den Mac VERSCHIEBEN (nicht kopieren): Danach liegen sie nur
