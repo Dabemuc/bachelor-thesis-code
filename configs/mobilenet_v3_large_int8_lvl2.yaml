@@ -2,14 +2,13 @@
 # ⚠️ Hard-Swish ist im DFC 3.33.1 nur „preview“ (Doku Translating TF/ONNX, S. 10).
 # Im Compile-Log prüfen: Anzahl Kontexte (Single Context?), TSE/SE-Umbau, Warnungen zu Hard-Swish.
 #
-# TODO vor dem Compile: end_node_names bestimmen
-#   thesis-export-onnx mobilenet_v3_large
-#   thesis-onnx-nodes artifacts/onnx/mobilenet_v3_large.onnx --grep features.16
-#   → Ausgangsknoten von features[16] (letzte Conv-Stufe vor dem AvgPool, 7×7×960; bei opset 13
-#     ist Hard-Swish als HardSigmoid + Mul exportiert → der Mul-Knoten) = Eigen-CAM-Ausgang,
-#     muss model.features in reference/fp32_run.py entsprechen
-#   thesis-onnx-nodes artifacts/onnx/mobilenet_v3_large.onnx --grep classifier
-#   → letzter Gemm-Knoten = Logits
+# Aus thesis-onnx-nodes (torchvision MobileNetV3-Large IMAGENET1K_V1, TorchScript-Exporter,
+# opset 13, Mac), 20.10.2026:
+#   /features/features.16/features.16.2/Mul → Ausgang von features[16] (Conv 1×1 + Hard-Swish,
+#     exportiert als HardSigmoid + Mul) = letzte Conv-Stufe vor dem AvgPool, 7×7×960 → Eigen-CAM.
+#     Entspricht dem Forward-Hook auf model.features in reference/fp32_run.py.
+#   /classifier/classifier.3/Gemm → Logits (1000; ONNX-Ausgang „logits“).
+# Bei anderem torch-/Exporter-Stand können sich die Namen ändern → neu nachsehen.
 name: mobilenet_v3_large_int8_lvl2
 model: mobilenet_v3_large
 precision: int8
@@ -19,8 +18,8 @@ calib_size: 1024
 onnx: onnx/mobilenet_v3_large.onnx
 hef: mobilenet_v3_large_int8_lvl2/mobilenet_v3_large.hef
 end_node_names:
-  - "TODO_features16_output"      # siehe oben
-  - "TODO_classifier_gemm"
+  - "/features/features.16/features.16.2/Mul"
+  - "/classifier/classifier.3/Gemm"
 normalize_on_chip: true
 optimization_level: 2
 warmup_iters: 50
