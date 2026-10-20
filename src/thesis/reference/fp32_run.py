@@ -2,7 +2,7 @@
 
     python -m thesis.reference.fp32_run configs/resnet18_fp32.yaml [--device cuda]
 
-Schreibt ``logits.npz`` und ``features.npz`` (Feature-Maps als [H, W, K], also
+Schreibt ``logits.npz`` und – bei ``save_features: true`` – ``features.npz`` (Feature-Maps als [H, W, K], also
 bereits ins HailoRT-Layout transponiert) in einen eigenen Run-Ordner. Damit
 lassen sich Edge- und Referenzlauf mit ``thesis.analysis`` direkt vergleichen.
 
@@ -19,6 +19,7 @@ import numpy as np
 
 from ..common.config import load_config
 from ..common.preprocess import load_uint8, normalize, to_nchw_batch
+from ..common.progress import Progress
 from ..common.runmeta import new_run_dir, write_meta
 from ..common.subset import read_subset
 
@@ -58,6 +59,7 @@ def main() -> None:
     with torch.no_grad(), open(run_dir / "predictions.csv", "w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(["image_id", "label", "top1", "top5"])
+        prog = Progress(len(items), label=cfg.name)
         for it in items:
             x = torch.from_numpy(to_nchw_batch(normalize(load_uint8(it.path)))).to(args.device)
             logits = model(x)[0].cpu().numpy()
@@ -66,10 +68,13 @@ def main() -> None:
             w.writerow([it.image_id, it.label, int(top5[0]), " ".join(map(str, top5))])
             ids.append(it.image_id)
             logits_all.append(logits.astype(np.float32))
-            feats_all.append(feat.astype(np.float32))
+            if cfg.save_features:
+                feats_all.append(feat.astype(np.float32))
+            prog.step()
 
     np.savez_compressed(run_dir / "logits.npz", ids=np.array(ids), logits=np.stack(logits_all))
-    np.savez_compressed(run_dir / "features.npz", ids=np.array(ids), features=np.stack(feats_all))
+    if feats_all:
+        np.savez_compressed(run_dir / "features.npz", ids=np.array(ids), features=np.stack(feats_all))
     print(f"fertig → {run_dir}")
 
 

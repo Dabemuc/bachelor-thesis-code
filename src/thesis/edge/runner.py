@@ -36,6 +36,7 @@ import numpy as np
 
 from ..common.config import load_config
 from ..common.preprocess import load_uint8, normalize
+from ..common.progress import Progress
 from ..common.runmeta import hef_provenance, new_run_dir, write_meta
 from ..common.subset import read_subset
 from . import telemetry
@@ -131,6 +132,7 @@ def main() -> None:
             with open(run_dir / "predictions.csv", "w", newline="") as f:
                 w = csv.writer(f, lineterminator="\n")
                 w.writerow(["image_id", "label", "top1", "top5", "latency_ms", "repeat", "out_sha1"])
+                prog = Progress(cfg.repeats * len(items), label=cfg.name)
                 for rep in range(cfg.repeats):
                     for it in items:
                         img = load_uint8(it.path)
@@ -151,6 +153,7 @@ def main() -> None:
                             logits_all.append(logits.astype(np.float32))
                             if feats is not None and cfg.save_features:
                                 feats_all.append(feats.astype(np.float32))
+                        prog.step()
         tlog.stop()
 
     np.savez_compressed(run_dir / "logits.npz", ids=np.array(ids), logits=np.stack(logits_all))
