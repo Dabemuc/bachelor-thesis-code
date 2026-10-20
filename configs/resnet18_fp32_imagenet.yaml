@@ -1,0 +1,8 @@
+# FP32-Referenz auf ImageNet-Val (Eval-Liste), Gegenstück zu resnet18_int8_lvl2*.yaml
+# Phase 1: mit --limit wie beim Edge-Lauf (z. B. --limit 200)
+name: resnet18_fp32_imagenet
+model: resnet18
+precision: fp32
+subset: imagenet_eval_48000.txt
+normalize_on_chip: false          # PyTorch bekommt normalisierte float32-Eingaben
+save_features: true

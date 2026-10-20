@@ -1,0 +1,8 @@
+# NUR Sanity-Check (Phase 0b): FP32-Top-1 auf allen 50 000 Val-Bildern gegen torchvision
+# (ResNet18 IMAGENET1K_V1: acc@1 69,758 %). Enthält die Kalibrierbilder → nicht zum Vergleichen.
+name: resnet18_fp32_val50k
+model: resnet18
+precision: fp32
+subset: imagenet_val_all_50000.txt
+normalize_on_chip: false
+save_features: false

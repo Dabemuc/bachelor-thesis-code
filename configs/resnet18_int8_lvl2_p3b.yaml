@@ -1,0 +1,20 @@
+# P3 (Determinismus Compile): identisch zu resnet18_int8_lvl2.yaml, nur anderer HEF-Pfad.
+# Danach: HEF-SHA-256 beider Compiles vergleichen; bei Abweichung beide auf dem Pi laufen lassen
+# und Ausgaben vergleichen (Finetune-Zufall?).
+name: resnet18_int8_lvl2_p3b
+model: resnet18
+precision: int8
+subset: imagenet_eval_48000.txt
+calib_subset: imagenet_calib_2000_seed1.txt
+calib_size: 1024
+onnx: onnx/resnet18.onnx
+hef: resnet18_int8_lvl2_p3b/resnet18.hef
+end_node_names:
+  - "/layer4/layer4.1/relu_1/Relu"
+  - "/fc/Gemm"
+normalize_on_chip: true
+optimization_level: 2
+warmup_iters: 50
+repeats: 1
+save_features: true
+notes: "Phase 1: P3, zweiter Compile von resnet18_int8_lvl2"

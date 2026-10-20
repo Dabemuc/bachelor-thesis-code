@@ -1,0 +1,22 @@
+# P1 (Kompilierstufe = Numerik?): wie resnet18_int8_lvl2.yaml + compiler_optimization_level=max.
+# out_sha1 je Bild mit resnet18_int8_lvl2 vergleichen; zusätzlich `hailortcli benchmark` beider HEFs.
+# ⚠️ Nur sauber interpretierbar, wenn P3 zeigt, dass zwei Compiles derselben Config gleich sind.
+name: resnet18_int8_lvl2_p1max
+model: resnet18
+precision: int8
+subset: imagenet_eval_48000.txt
+calib_subset: imagenet_calib_2000_seed1.txt
+calib_size: 1024
+onnx: onnx/resnet18.onnx
+hef: resnet18_int8_lvl2_p1max/resnet18.hef
+end_node_names:
+  - "/layer4/layer4.1/relu_1/Relu"
+  - "/fc/Gemm"
+normalize_on_chip: true
+optimization_level: 2
+model_script:
+  - "performance_param(compiler_optimization_level=max)"
+warmup_iters: 50
+repeats: 1
+save_features: true
+notes: "Phase 1: P1"

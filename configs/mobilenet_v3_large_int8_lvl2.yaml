@@ -1,0 +1,29 @@
+# P11 + Kern-Konfiguration MobileNetV3-Large (torchvision IMAGENET1K_V1), INT8, DFC-Stufe 2
+# ⚠️ Hard-Swish ist im DFC 3.33.1 nur „preview“ (Doku Translating TF/ONNX, S. 10).
+# Im Compile-Log prüfen: Anzahl Kontexte (Single Context?), TSE/SE-Umbau, Warnungen zu Hard-Swish.
+#
+# TODO vor dem Compile: end_node_names bestimmen
+#   thesis-export-onnx mobilenet_v3_large
+#   thesis-onnx-nodes artifacts/onnx/mobilenet_v3_large.onnx --grep features.16
+#   → Ausgangsknoten von features[16] (letzte Conv-Stufe vor dem AvgPool, 7×7×960; bei opset 13
+#     ist Hard-Swish als HardSigmoid + Mul exportiert → der Mul-Knoten) = Eigen-CAM-Ausgang,
+#     muss model.features in reference/fp32_run.py entsprechen
+#   thesis-onnx-nodes artifacts/onnx/mobilenet_v3_large.onnx --grep classifier
+#   → letzter Gemm-Knoten = Logits
+name: mobilenet_v3_large_int8_lvl2
+model: mobilenet_v3_large
+precision: int8
+subset: imagenet_eval_48000.txt
+calib_subset: imagenet_calib_2000_seed1.txt
+calib_size: 1024
+onnx: onnx/mobilenet_v3_large.onnx
+hef: mobilenet_v3_large_int8_lvl2/mobilenet_v3_large.hef
+end_node_names:
+  - "TODO_features16_output"      # siehe oben
+  - "TODO_classifier_gemm"
+normalize_on_chip: true
+optimization_level: 2
+warmup_iters: 50
+repeats: 3
+save_features: true
+notes: "Phase 1: P11 (läuft MobileNetV3 durch die Kette?)"

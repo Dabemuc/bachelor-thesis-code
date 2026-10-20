@@ -1,0 +1,8 @@
+# FP32-Referenz MobileNetV3-Large (torchvision IMAGENET1K_V1, Entscheidung E-B 20.10.2026)
+# CAM-Schicht = Ausgang von model.features (7×7×960), siehe CAM_LAYER in reference/fp32_run.py
+name: mobilenet_v3_large_fp32_imagenet
+model: mobilenet_v3_large
+precision: fp32
+subset: imagenet_eval_48000.txt
+normalize_on_chip: false
+save_features: true
