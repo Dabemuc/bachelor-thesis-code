@@ -51,10 +51,15 @@ COPY hailo_dataflow_compiler-*.whl /tmp/
 RUN pip install --upgrade pip && pip install /tmp/hailo_dataflow_compiler-*.whl && rm /tmp/*.whl
 
 # Optional GPU: CUDA/cuDNN/nvcc als pip-Pakete, exakt passend zur vom DFC gepinnten TF-Version.
+# nvcc/libdevice für die XLA-JIT fehlt in tensorflow[and-cuda] → ohne nvidia-cuda-nvcc-cu12 bricht die
+# Optimierung mit „libdevice not found at ./libdevice.10.bc“ / „JIT compilation failed“ ab
+# (06.10. im Container von Hand ergänzt, 20.10.2026 im neu gebauten Image wieder aufgetreten).
+# 12.5 = CUDA-Version von TF 2.18.
 ARG WITH_CUDA=0
 RUN if [ "$WITH_CUDA" = "1" ]; then \
         TFV=$(python -c "import importlib.metadata as m; print(m.version('tensorflow'))") && \
-        pip install "tensorflow[and-cuda]==${TFV}"; \
+        pip install "tensorflow[and-cuda]==${TFV}" && \
+        pip install "nvidia-cuda-nvcc-cu12==12.5.*"; \
     fi
 
 # Schnelltest:  docker run --rm thesis-dfc hailo --version
