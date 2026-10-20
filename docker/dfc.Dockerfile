@@ -47,6 +47,10 @@ ENV PATH=/opt/dfc/bin:$PATH
 
 ENV USER=root
 
+# Repo wird als /work gemountet und gehört dem Host-Nutzer → git im Container (root) meldet
+# „dubious ownership“; dann fehlt der Commit in compile_meta.json (git.commit: null, 20.10.2026).
+RUN git config --system --add safe.directory /work
+
 COPY hailo_dataflow_compiler-*.whl /tmp/
 RUN pip install --upgrade pip && pip install /tmp/hailo_dataflow_compiler-*.whl && rm /tmp/*.whl
 

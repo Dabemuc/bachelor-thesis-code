@@ -1,0 +1,24 @@
+# P3 für Stufe 4: Ist Stufe 4 (Equalization + AdaRound auf allen Schichten, KEIN Finetune) mit
+# set_seed reproduzierbar? Zwei identische Compiles (resnet18_int8_lvl4_seed / _b) → HEF-Hash +
+# Ausgaben auf dem Pi vergleichen. Zusätzlich Compile-Zeit messen (Hailo-Referenz: ~43× Stufe 2).
+# Hintergrund: Stufe 2 ist laut DFC per Design nicht reproduzierbar (set_seed + Finetune → Fehler,
+# sdk_backend.py:1525–1531); P3 mit Stufe 2: 0/200 Logits bitgleich (Vault: E2, 21.10.2026).
+name: resnet18_int8_lvl4_seed
+model: resnet18
+precision: int8
+subset: imagenet_eval_48000.txt
+calib_subset: imagenet_calib_2000_seed1.txt
+calib_size: 1024                  # Stufe 4 braucht ≥ 1024 (Doku MO S. 7), AdaRound nutzt 1024
+onnx: onnx/resnet18.onnx
+hef: resnet18_int8_lvl4_seed/resnet18.hef
+end_node_names:
+  - "/layer4/layer4.1/relu_1/Relu"
+  - "/fc/Gemm"
+normalize_on_chip: true
+optimization_level: 4
+model_script:
+  - "set_seed(0)"                 # Python/NumPy/TF-Seeds + tf enable_op_determinism (model_modifications_commands.py:625–634)
+warmup_iters: 50
+repeats: 1
+save_features: true
+notes: "Phase 1: P3 für Stufe 4 mit set_seed"
