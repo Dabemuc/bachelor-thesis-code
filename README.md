@@ -79,6 +79,19 @@ scripts/sync_to_pi.sh pull     # verschiebt neue Läufe vom Pi hierher (Pi bleib
 python -m thesis.analysis.compare_runs results/<fp32-run> results/<edge-run>
 ```
 
+## Emulator (P10+, Grad-CAM-Quelle)
+
+```bash
+# Windows-PC: die Eval-Bilder müssen dort liegen (vom Mac aus, erste 200):
+#   scripts/sync_subset_images.sh imagenet_eval_48000.txt <ziel>/data/images/ 200
+# im DFC-Container (nach `pip install -e ".[compile]"`, damit das Kommando existiert):
+thesis-emulator-run configs/resnet18_int8_lvl2.yaml --limit 200 \
+    --target-run results/20261021-012047_roosevelt_resnet18_fp32_imagenet
+# → results/<zeit>_<host>_<name>_emu_native/ und …_emu_quantized/ (+ gradients.npz, checks.json)
+# Mac: Emulator gegen Chip DESSELBEN Compiles
+python -m thesis.analysis.compare_runs results/<chip-lauf> results/<emu_quantized-lauf>
+```
+
 AP0 ist abgeschlossen, wenn Top-1-Match und Logit-Cosinus plausibel sind und die
 Eigen-CAM-Metriken aus echten Hailo-Feature-Maps berechnet werden.
 
