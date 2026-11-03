@@ -1,0 +1,70 @@
+{
+  "started": "2026-11-03T15:19:23",
+  "host": "875729430ec1",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "machine": "x86_64",
+  "python": "3.10.12",
+  "git": {
+    "commit": "fcca442c6cc2c9a4ca60bcba2af9dc34e1bda933",
+    "dirty": false,
+    "dirty_files": []
+  },
+  "packages": {
+    "numpy": "1.26.4",
+    "torch": null,
+    "onnx": "1.16.0",
+    "hailort": null,
+    "hailo-dataflow-compiler": "3.33.1"
+  },
+  "config": {
+    "name": "resnet18_int8_lvl2",
+    "model": "resnet18",
+    "precision": "int8",
+    "subset": "imagenet_eval_48000.txt",
+    "onnx": "onnx/resnet18.onnx",
+    "hef": "resnet18_int8_lvl2/resnet18.hef",
+    "end_node_names": [
+      "/layer4/layer4.1/relu_1/Relu",
+      "/fc/Gemm"
+    ],
+    "normalize_on_chip": true,
+    "calib_subset": "imagenet_calib_2000_seed1.txt",
+    "calib_size": 1024,
+    "optimization_level": 2,
+    "model_script": [],
+    "warmup_iters": 50,
+    "repeats": 3,
+    "save_features": true,
+    "notes": "Phase 1: P2 (repeats=3) und Referenz für P3"
+  },
+  "n_images": 200,
+  "role": "emulator",
+  "emulator_context": "sdk_native",
+  "har": {
+    "path": "/work/artifacts/resnet18_int8_lvl2/resnet18_quantized.har",
+    "sha256": "276d0630ff5ffb5fa28682482e8ed70bd126732d021cf9399446975fdcbb688b"
+  },
+  "hef": {
+    "path": "/work/artifacts/resnet18_int8_lvl2/resnet18.hef",
+    "sha256": "2e8e92d194a49741e887936738657bd63c8cb9ef349e74f59148fa5f7f212acc",
+    "compile_meta": {
+      "created": "2026-10-20T18:26:15",
+      "hw_arch": "hailo8",
+      "model_script": [
+        "normalization1 = normalization([123.675, 116.28, 103.53], [58.395, 57.120000000000005, 57.375])",
+        "model_optimization_flavor(optimization_level=2)"
+      ],
+      "calib_n": null,
+      "calib_array_n": 1024,
+      "onnx_sha256": "1cfe2538e1da6dc19ad3b94dec8248b8b06591274018a96d17a29c4877329add",
+      "hef_sha256": "2e8e92d194a49741e887936738657bd63c8cb9ef349e74f59148fa5f7f212acc",
+      "git": {
+        "commit": null,
+        "dirty": false,
+        "dirty_files": []
+      },
+      "dfc_version": "3.33.1"
+    }
+  },
+  "target_run": "results/20261021-012047_roosevelt_resnet18_fp32_imagenet"
+}

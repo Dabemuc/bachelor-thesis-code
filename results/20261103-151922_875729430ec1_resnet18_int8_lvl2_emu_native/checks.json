@@ -1,0 +1,57 @@
+{
+  "context": "sdk_native",
+  "keras_model": {
+    "class": "SimulationInferenceModel",
+    "trainable": false
+  },
+  "input": "auf dem Host normalisiert (float32)",
+  "normalization_layer_in_model": false,
+  "output_nodes": [
+    "resnet18/output_layer1",
+    "resnet18/output_layer2"
+  ],
+  "logits_node": "resnet18/output_layer2",
+  "features_node": "resnet18/output_layer1",
+  "output_shapes": [
+    [
+      200,
+      7,
+      7,
+      512
+    ],
+    [
+      200,
+      1,
+      1,
+      1000
+    ]
+  ],
+  "cam_layer": "resnet18/ew_add8",
+  "called": "HailoModel direkt (km.model), training=True (STE)",
+  "cam_layer_output_scale": {
+    "n": 1,
+    "min": 1.0,
+    "max": 1.0
+  },
+  "cam_layer_output_zero_point": {
+    "n": 1,
+    "min": 0.0,
+    "max": 0.0
+  },
+  "target": "top1 aus results/20261021-012047_roosevelt_resnet18_fp32_imagenet",
+  "gradient_scale": "unverändert (interne Schicht = Feature-Ausgang)",
+  "internal_dequantized_vs_feature_output_max_abs_diff": 0.0,
+  "a_max_abs_diff_logits_keras_vs_infer": 0.028412342071533203,
+  "a_max_abs_diff_features_keras_vs_infer": 0.06479310989379883,
+  "internal_vs_feature_output_max_abs_diff": 0.0,
+  "b_gradient_none_batches": 0,
+  "b_gradient_finite": true,
+  "b_gradient_nonzero_fraction": 1.0,
+  "b_gradient_abs_mean": 0.0010362137109041214,
+  "b_gradient_shape": [
+    200,
+    7,
+    7,
+    512
+  ]
+}
