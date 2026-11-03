@@ -154,56 +154,66 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
         if ctx_name == "bit_exact":
             checks["gradients_skipped"] = "bit_exact: Keras-Modell wäre nativ (sdk_backend.get_emulation_model)"
         elif args.gradients and i_feat is not None:
-            feat_layer = hm.flow.predecessors_sorted(out_nodes[i_feat])[0]
-            checks["cam_layer"] = feat_layer
-            hm.set_output_interal_layers([feat_layer])
+            try:
+                feat_layer = hm.flow.predecessors_sorted(out_nodes[i_feat])[0]
+                checks["cam_layer"] = feat_layer
+                hm.set_output_interal_layers([feat_layer])
+                # Eingabe als dict {Eingangsschicht: Tensor}: InferenceModel.build → get_build_inputs
+                # akzeptiert nur dict oder tf.data-Dataset, kein nacktes Tensor-Batch (Fehler 03.11.2026)
+                in_name = hm.flow.input_nodes[0]
+                checks["input_layer"] = in_name
 
-            if args.target_run:
-                tgt = np.array([targets[it.image_id] for it in items])
-                checks["target"] = f"top1 aus {args.target_run}"
-            else:
-                tgt = logits.argmax(1)
-                checks["target"] = "eigene top1 dieses Kontexts"
+                if args.target_run:
+                    tgt = np.array([targets[it.image_id] for it in items])
+                    checks["target"] = f"top1 aus {args.target_run}"
+                else:
+                    tgt = logits.argmax(1)
+                    checks["target"] = "eigene top1 dieses Kontexts"
 
-            grads_all, d_log, d_feat, d_int = [], [], [], []
-            n_none = 0
-            prog = Progress(n, label=f"{cfg.name} emu_{ctx_name} Gradienten")
-            for s in range(0, n, args.batch_size):
-                xb = tf.constant(x_all[s:s + args.batch_size])
-                tb = tgt[s:s + args.batch_size]
-                with tf.GradientTape() as tape:
-                    res = km(xb, training=False)
-                    outs_b, internals = res
-                    outs_b = list(outs_b) if isinstance(outs_b, (list, tuple)) else [outs_b]
-                    act = internals[0]
-                    lg = tf.reshape(outs_b[i_log], (xb.shape[0], -1))
-                    sel = tf.gather(lg, tb, axis=1, batch_dims=1)
-                    y = tf.reduce_sum(sel)  # Bilder sind unabhängig (Inferenz) → Summe = Einzelgradienten
-                g = tape.gradient(y, act)
-                if g is None:
-                    n_none += 1
-                    g = tf.zeros_like(act)
-                grads_all.append(_to_np(g).astype(np.float32))
-                # (a) gleiche Zahlen wie runner.infer?
-                d_log.append(np.abs(_to_np(lg) - logits[s:s + args.batch_size]).max())
-                if feats is not None:
-                    fb = _to_np(outs_b[i_feat])
-                    d_feat.append(np.abs(fb - feats[s:s + args.batch_size]).max())
-                    # interne Schicht = Feature-Ausgang? (Ausgangsschicht nur Durchreichung/Dequantisierung?)
-                    d_int.append(np.abs(_to_np(act) - fb).max())
-                prog.step(int(xb.shape[0]))
-            hm.reset_output_interal_layers()
+                grads_all, d_log, d_feat, d_int = [], [], [], []
+                n_none = 0
+                prog = Progress(n, label=f"{cfg.name} emu_{ctx_name} Gradienten")
+                for s in range(0, n, args.batch_size):
+                    xb = tf.constant(x_all[s:s + args.batch_size])
+                    bs = int(xb.shape[0])
+                    tb = tgt[s:s + args.batch_size]
+                    with tf.GradientTape() as tape:
+                        res = km({in_name: xb}, training=False)
+                        outs_b, internals = res
+                        outs_b = list(outs_b) if isinstance(outs_b, (list, tuple)) else [outs_b]
+                        act = internals[0]
+                        lg = tf.reshape(outs_b[i_log], (bs, -1))
+                        sel = tf.gather(lg, tb, axis=1, batch_dims=1)
+                        y = tf.reduce_sum(sel)  # Bilder sind unabhängig (Inferenz) → Summe = Einzelgradienten
+                    g = tape.gradient(y, act)
+                    if g is None:
+                        n_none += 1
+                        g = tf.zeros_like(act)
+                    grads_all.append(_to_np(g).astype(np.float32))
+                    # (a) gleiche Zahlen wie runner.infer?
+                    d_log.append(np.abs(_to_np(lg) - logits[s:s + args.batch_size]).max())
+                    if feats is not None:
+                        fb = _to_np(outs_b[i_feat])
+                        d_feat.append(np.abs(fb - feats[s:s + args.batch_size]).max())
+                        # interne Schicht = Feature-Ausgang? (Ausgangsschicht nur Durchreichung/Dequantisierung?)
+                        d_int.append(np.abs(_to_np(act) - fb).max())
+                    prog.step(bs)
+                hm.reset_output_interal_layers()
 
-            grads = np.concatenate(grads_all)
-            checks["a_max_abs_diff_logits_keras_vs_infer"] = float(max(d_log))
-            checks["a_max_abs_diff_features_keras_vs_infer"] = float(max(d_feat)) if d_feat else None
-            checks["internal_vs_feature_output_max_abs_diff"] = float(max(d_int)) if d_int else None
-            checks["b_gradient_none_batches"] = n_none
-            checks["b_gradient_finite"] = bool(np.isfinite(grads).all())
-            checks["b_gradient_nonzero_fraction"] = float((grads != 0).mean())
-            checks["b_gradient_abs_mean"] = float(np.abs(grads).mean())
-            checks["b_gradient_shape"] = list(grads.shape)
-            np.savez_compressed(run_dir / "gradients.npz", ids=ids, target=tgt, gradients=grads)
+                grads = np.concatenate(grads_all)
+                checks["a_max_abs_diff_logits_keras_vs_infer"] = float(max(d_log))
+                checks["a_max_abs_diff_features_keras_vs_infer"] = float(max(d_feat)) if d_feat else None
+                checks["internal_vs_feature_output_max_abs_diff"] = float(max(d_int)) if d_int else None
+                checks["b_gradient_none_batches"] = n_none
+                checks["b_gradient_finite"] = bool(np.isfinite(grads).all())
+                checks["b_gradient_nonzero_fraction"] = float((grads != 0).mean())
+                checks["b_gradient_abs_mean"] = float(np.abs(grads).mean())
+                checks["b_gradient_shape"] = list(grads.shape)
+                np.savez_compressed(run_dir / "gradients.npz", ids=ids, target=tgt, gradients=grads)
+            except Exception as e:
+                checks["error"] = f"{type(e).__name__}: {e}"
+                (run_dir / "checks.json").write_text(json.dumps(checks, indent=2, ensure_ascii=False), encoding="utf-8")
+                raise
 
     (run_dir / "checks.json").write_text(json.dumps(checks, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(checks, indent=2, ensure_ascii=False))
