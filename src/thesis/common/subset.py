@@ -52,14 +52,29 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Festes Bild-Subset erzeugen")
     ap.add_argument("labels", help="Datei mit allen Kandidaten: <rel_path>\\t<label>")
     ap.add_argument("out", help="Zieldatei, z. B. data/subsets/val_1000_seed0.txt")
-    ap.add_argument("-n", type=int, required=True)
+    grp = ap.add_mutually_exclusive_group(required=True)
+    grp.add_argument("-n", type=int, help="n Bilder zufällig aus allen Kandidaten")
+    grp.add_argument("--per-class", type=int,
+                     help="geschichtet: je Klasse genau so viele Bilder (alle Klassen gleich stark)")
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
 
     pool = read_subset(args.labels)
     rng = random.Random(args.seed)
-    chosen = sorted(rng.sample(pool, args.n), key=lambda it: it.image_id)
-    write_subset(args.out, chosen, header=f"source={args.labels} n={args.n} seed={args.seed}")
+    if args.per_class:
+        by_class: dict[int, list[SubsetItem]] = {}
+        for it in sorted(pool, key=lambda it: it.image_id):
+            by_class.setdefault(it.label, []).append(it)
+        short = {c: len(v) for c, v in by_class.items() if len(v) < args.per_class}
+        if short:
+            raise SystemExit(f"{len(short)} Klassen haben weniger als {args.per_class} Kandidaten, z. B. {next(iter(short.items()))}")
+        chosen = [it for c in sorted(by_class) for it in rng.sample(by_class[c], args.per_class)]
+        desc = f"per_class={args.per_class} classes={len(by_class)} n={len(chosen)}"
+    else:
+        chosen = rng.sample(pool, args.n)
+        desc = f"n={args.n}"
+    chosen = sorted(chosen, key=lambda it: it.image_id)
+    write_subset(args.out, chosen, header=f"source={args.labels} {desc} seed={args.seed}")
     print(f"{len(chosen)} Bilder → {args.out}")
 
 

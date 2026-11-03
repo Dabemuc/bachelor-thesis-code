@@ -1,0 +1,24 @@
+# Test vor dem Kern (03.11.2026): identisch zu mobilenet_v3_large_int8_lvl2.yaml, aber Statistik-Kalibrierung
+# mit 1024 statt DFC-Default 64 Bildern (Syntax: Vault „DFC 3.33.1 Stellschrauben“).
+# Frage: Verschwindet die Logit-Sättigung (Ziel-Logit am Ende des Ausgabebereichs, ~2 % der Bilder)?
+# Vergleich gegen die beiden 64er-Compiles A/B auf denselben 200 Bildern (Chip, --limit 200).
+# Node-Namen s. mobilenet_v3_large_int8_lvl2.yaml.
+name: mobilenet_v3_large_int8_lvl2_cal1024
+model: mobilenet_v3_large
+precision: int8
+subset: imagenet_eval_48000.txt
+calib_subset: imagenet_calib_2000_seed1.txt
+calib_size: 1024
+onnx: onnx/mobilenet_v3_large.onnx
+hef: mobilenet_v3_large_int8_lvl2_cal1024/mobilenet_v3_large.hef
+end_node_names:
+  - "/features/features.16/features.16.2/Mul"
+  - "/classifier/classifier.3/Gemm"
+normalize_on_chip: true
+optimization_level: 2
+model_script:
+  - "model_optimization_config(calibration, calibset_size=1024)"
+warmup_iters: 50
+repeats: 1
+save_features: true
+notes: "Test vor dem Kern: Kalibrierung mit 1024 statt 64 Bildern (Logit-Sättigung?)"
