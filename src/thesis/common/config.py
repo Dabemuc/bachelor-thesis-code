@@ -16,6 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 ARTIFACTS_DIR = REPO_ROOT / "artifacts"
 DATA_DIR = REPO_ROOT / "data"
 RESULTS_DIR = REPO_ROOT / "results"
+LOGS_DIR = REPO_ROOT / "logs"
 
 # ImageNet-Preprocessing (torchvision-Standard)
 IMAGE_SIZE = 224
