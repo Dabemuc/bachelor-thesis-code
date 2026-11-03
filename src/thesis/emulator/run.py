@@ -164,7 +164,23 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
                 # derselben Form wie get_build_inputs sie für Tensoren bildet: (1, H, W, C).
                 if not hm.built:
                     hm.build((1, *x_all.shape[1:]))
-                checks["called"] = "HailoModel direkt (km.model), training=False"
+                # training=True: Nur dann rundet Hailo mit STE (fake_quant_int, @tf.custom_gradient).
+                # Mit training=False ist der Modus DISABLED → nacktes tf.round ohne Gradient → None
+                # (acceleras/lossy_elements/quant_element.py, BaseQuantElement.quant_call; Lauf 03.11.2026:
+                # 25/25 Batches ohne Gradient). Vorwärts ist STE = clip(round(x)), also gleiche Zahlen;
+                # geprüft unten über (a) gegen runner.infer.
+                checks["called"] = "HailoModel direkt (km.model), training=True (STE)"
+
+                # Die interne Schicht liefert im quantisierten Kontext Werte im Integer-Bereich, der
+                # Feature-Ausgang dagegen dequantisiert: real = (int - zp) * scale. Für Grad-CAM auf der
+                # Skala der Chip-Feature-Maps: dY/dA_real = dY/dA_int / scale.
+                lay = hm.layers[feat_layer]
+                oi = hm.flow.get_edge_output_index(feat_layer, out_nodes[i_feat])
+                oi = lay.resolve_output_index(oi) if hasattr(lay, "resolve_output_index") else oi
+                scale = np.asarray(_to_np(lay.output_scales[oi]), dtype=np.float32).reshape(-1)
+                zp = np.asarray(_to_np(lay.output_zero_points[oi]), dtype=np.float32).reshape(-1)
+                checks["cam_layer_output_scale"] = {"n": int(scale.size), "min": float(scale.min()), "max": float(scale.max())}
+                checks["cam_layer_output_zero_point"] = {"n": int(zp.size), "min": float(zp.min()), "max": float(zp.max())}
 
                 if args.target_run:
                     tgt = np.array([targets[it.image_id] for it in items])
@@ -173,7 +189,7 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
                     tgt = logits.argmax(1)
                     checks["target"] = "eigene top1 dieses Kontexts"
 
-                grads_all, d_log, d_feat, d_int = [], [], [], []
+                grads_all, d_log, d_feat, d_int, d_deq = [], [], [], [], []
                 n_none = 0
                 prog = Progress(n, label=f"{cfg.name} emu_{ctx_name} Gradienten")
                 for s in range(0, n, args.batch_size):
@@ -181,7 +197,7 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
                     bs = int(xb.shape[0])
                     tb = tgt[s:s + args.batch_size]
                     with tf.GradientTape() as tape:
-                        res = hm(xb, training=False)
+                        res = hm(xb, training=True)
                         outs_b, internals = res
                         outs_b = list(outs_b) if isinstance(outs_b, (list, tuple)) else [outs_b]
                         act = internals[0]
@@ -193,17 +209,27 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
                         n_none += 1
                         g = tf.zeros_like(act)
                     grads_all.append(_to_np(g).astype(np.float32))
+                    act_np = _to_np(act).astype(np.float32)
                     # (a) gleiche Zahlen wie runner.infer?
                     d_log.append(np.abs(_to_np(lg) - logits[s:s + args.batch_size]).max())
                     if feats is not None:
                         fb = _to_np(outs_b[i_feat])
                         d_feat.append(np.abs(fb - feats[s:s + args.batch_size]).max())
                         # interne Schicht = Feature-Ausgang? (Ausgangsschicht nur Durchreichung/Dequantisierung?)
-                        d_int.append(np.abs(_to_np(act) - fb).max())
+                        d_int.append(np.abs(act_np - fb).max())
+                        d_deq.append(np.abs((act_np - zp) * scale - fb).max())
                     prog.step(bs)
                 hm.reset_output_interal_layers()
 
                 grads = np.concatenate(grads_all)
+                # Umrechnung nur, wenn die Dequantisierung die interne Schicht tatsächlich auf den
+                # Feature-Ausgang abbildet (im nativen Kontext ist beides schon gleich).
+                if d_int and max(d_deq) < max(d_int):
+                    grads = grads / scale
+                    checks["gradient_scale"] = "dY/dA_real = dY/dA_int / scale (Feature-Ausgang-Skala)"
+                else:
+                    checks["gradient_scale"] = "unverändert (interne Schicht = Feature-Ausgang)"
+                checks["internal_dequantized_vs_feature_output_max_abs_diff"] = float(max(d_deq)) if d_deq else None
                 checks["a_max_abs_diff_logits_keras_vs_infer"] = float(max(d_log))
                 checks["a_max_abs_diff_features_keras_vs_infer"] = float(max(d_feat)) if d_feat else None
                 checks["internal_vs_feature_output_max_abs_diff"] = float(max(d_int)) if d_int else None
