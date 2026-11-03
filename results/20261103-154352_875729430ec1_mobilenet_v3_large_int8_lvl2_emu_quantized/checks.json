@@ -1,0 +1,57 @@
+{
+  "context": "sdk_quantized",
+  "keras_model": {
+    "class": "SimulationTrainingModel",
+    "trainable": true
+  },
+  "input": "uint8-Werte als float32 (0–255), Normalisierung im Modell",
+  "normalization_layer_in_model": true,
+  "output_nodes": [
+    "mobilenet_v3_large/output_layer1",
+    "mobilenet_v3_large/output_layer2"
+  ],
+  "logits_node": "mobilenet_v3_large/output_layer2",
+  "features_node": "mobilenet_v3_large/output_layer1",
+  "output_shapes": [
+    [
+      200,
+      7,
+      7,
+      960
+    ],
+    [
+      200,
+      1,
+      1,
+      1000
+    ]
+  ],
+  "cam_layer": "mobilenet_v3_large/conv31",
+  "called": "HailoModel direkt (km.model), training=True (STE)",
+  "cam_layer_output_scale": {
+    "n": 960,
+    "min": 0.1523750126361847,
+    "max": 0.1523750126361847
+  },
+  "cam_layer_output_zero_point": {
+    "n": 1,
+    "min": 3.0,
+    "max": 3.0
+  },
+  "target": "top1 aus results/20261021-012054_roosevelt_mobilenet_v3_large_fp32_imagenet",
+  "gradient_scale": "dY/dA_real = dY/dA_int / scale (Feature-Ausgang-Skala)",
+  "internal_dequantized_vs_feature_output_max_abs_diff": 0.0,
+  "a_max_abs_diff_logits_keras_vs_infer": 0.0,
+  "a_max_abs_diff_features_keras_vs_infer": 0.0,
+  "internal_vs_feature_output_max_abs_diff": 216.60150146484375,
+  "b_gradient_none_batches": 0,
+  "b_gradient_finite": true,
+  "b_gradient_nonzero_fraction": 0.9849947916666667,
+  "b_gradient_abs_mean": 0.0028972409199923277,
+  "b_gradient_shape": [
+    200,
+    7,
+    7,
+    960
+  ]
+}
