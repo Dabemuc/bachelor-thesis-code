@@ -88,6 +88,8 @@ python -m thesis.analysis.compare_runs results/<fp32-run> results/<edge-run>
 thesis-emulator-run configs/resnet18_int8_lvl2.yaml --limit 200 \
     --target-run results/20261021-012047_roosevelt_resnet18_fp32_imagenet
 # → results/<zeit>_<host>_<name>_emu_native/ und …_emu_quantized/ (+ gradients.npz, checks.json)
+# Windows → Mac: *.npz der Läufe (gitignored) per scp, nur fehlende Dateien
+#   powershell -ExecutionPolicy Bypass -File scripts\push_results_to_mac.ps1
 # Mac: Emulator gegen Chip DESSELBEN Compiles
 python -m thesis.analysis.compare_runs results/<chip-lauf> results/<emu_quantized-lauf>
 ```
