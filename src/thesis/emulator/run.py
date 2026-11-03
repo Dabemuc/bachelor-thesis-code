@@ -158,10 +158,13 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
                 feat_layer = hm.flow.predecessors_sorted(out_nodes[i_feat])[0]
                 checks["cam_layer"] = feat_layer
                 hm.set_output_interal_layers([feat_layer])
-                # Eingabe als dict {Eingangsschicht: Tensor}: InferenceModel.build → get_build_inputs
-                # akzeptiert nur dict oder tf.data-Dataset, kein nacktes Tensor-Batch (Fehler 03.11.2026)
-                in_name = hm.flow.input_nodes[0]
-                checks["input_layer"] = in_name
+                # HailoModel direkt aufrufen statt über den Keras-Wrapper: dessen build()
+                # (inference_flow.get_build_inputs) erwartet ein tf.data-Dataset und scheiterte am
+                # Tensor-Batch ebenso wie an einem dict (03.11.2026). Gebaut wird daher selbst, mit
+                # derselben Form wie get_build_inputs sie für Tensoren bildet: (1, H, W, C).
+                if not hm.built:
+                    hm.build((1, *x_all.shape[1:]))
+                checks["called"] = "HailoModel direkt (km.model), training=False"
 
                 if args.target_run:
                     tgt = np.array([targets[it.image_id] for it in items])
@@ -178,7 +181,7 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
                     bs = int(xb.shape[0])
                     tb = tgt[s:s + args.batch_size]
                     with tf.GradientTape() as tape:
-                        res = km({in_name: xb}, training=False)
+                        res = hm(xb, training=False)
                         outs_b, internals = res
                         outs_b = list(outs_b) if isinstance(outs_b, (list, tuple)) else [outs_b]
                         act = internals[0]
