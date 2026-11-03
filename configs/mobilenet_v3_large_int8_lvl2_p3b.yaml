@@ -1,0 +1,22 @@
+# P3 für MobileNetV3 (Determinismus Compile / eigener Zufallsboden): identisch zu
+# mobilenet_v3_large_int8_lvl2.yaml, nur anderer HEF-Pfad (wie resnet18_int8_lvl2_p3b.yaml).
+# Danach: HEF-SHA-256 beider Compiles vergleichen, beide auf denselben 200 Bildern auf dem Pi
+# laufen lassen und Compile A ↔ B sowie FP32 ↔ A/B vergleichen.
+# Node-Namen s. mobilenet_v3_large_int8_lvl2.yaml (thesis-onnx-nodes, 20.10.2026).
+name: mobilenet_v3_large_int8_lvl2_p3b
+model: mobilenet_v3_large
+precision: int8
+subset: imagenet_eval_48000.txt
+calib_subset: imagenet_calib_2000_seed1.txt
+calib_size: 1024
+onnx: onnx/mobilenet_v3_large.onnx
+hef: mobilenet_v3_large_int8_lvl2_p3b/mobilenet_v3_large.hef
+end_node_names:
+  - "/features/features.16/features.16.2/Mul"
+  - "/classifier/classifier.3/Gemm"
+normalize_on_chip: true
+optimization_level: 2
+warmup_iters: 50
+repeats: 1
+save_features: true
+notes: "Phase 1: P3 MobileNetV3, zweiter Compile von mobilenet_v3_large_int8_lvl2"
