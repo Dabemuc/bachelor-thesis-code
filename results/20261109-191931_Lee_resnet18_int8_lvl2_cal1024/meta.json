@@ -1,0 +1,68 @@
+{
+  "started": "2026-11-09T19:19:31",
+  "host": "Lee",
+  "platform": "Linux-6.18.50+rpt-rpi-2712-aarch64-with-glibc2.41",
+  "machine": "aarch64",
+  "python": "3.13.5",
+  "git": {
+    "commit": "02b48b89ad7a1a371931fa11401cd7e7e798d680",
+    "dirty": false,
+    "dirty_files": []
+  },
+  "packages": {
+    "numpy": "2.5.3",
+    "torch": null,
+    "onnx": null,
+    "hailort": "4.23.0",
+    "hailo-dataflow-compiler": null,
+    "hailort (dpkg)": "4.23.0"
+  },
+  "config": {
+    "name": "resnet18_int8_lvl2_cal1024",
+    "model": "resnet18",
+    "precision": "int8",
+    "subset": "imagenet_eval_48000.txt",
+    "onnx": "onnx/resnet18.onnx",
+    "hef": "resnet18_int8_lvl2_cal1024/resnet18.hef",
+    "end_node_names": [
+      "/layer4/layer4.1/relu_1/Relu",
+      "/fc/Gemm"
+    ],
+    "normalize_on_chip": true,
+    "calib_subset": "imagenet_calib_2000_seed1.txt",
+    "calib_size": 1024,
+    "optimization_level": 2,
+    "model_script": [
+      "model_optimization_config(calibration, calibset_size=1024)"
+    ],
+    "warmup_iters": 50,
+    "repeats": 1,
+    "save_features": true,
+    "notes": "Test vor dem Kern: Kalibrierung mit 1024 statt 64 Bildern (Logit-Sättigung?)"
+  },
+  "n_images": 200,
+  "role": "edge",
+  "hef": {
+    "path": "/home/pi/bachelor-thesis-code/artifacts/resnet18_int8_lvl2_cal1024/resnet18.hef",
+    "sha256": "c8ed7651107bd77ec532f75384128aa9c1decae83a36372548e0f78386ac3e87",
+    "compile_meta": {
+      "created": "2026-11-09T18:04:20",
+      "hw_arch": "hailo8",
+      "model_script": [
+        "normalization1 = normalization([123.675, 116.28, 103.53], [58.395, 57.120000000000005, 57.375])",
+        "model_optimization_flavor(optimization_level=2)",
+        "model_optimization_config(calibration, calibset_size=1024)"
+      ],
+      "calib_n": null,
+      "calib_array_n": 1024,
+      "onnx_sha256": "1cfe2538e1da6dc19ad3b94dec8248b8b06591274018a96d17a29c4877329add",
+      "hef_sha256": "c8ed7651107bd77ec532f75384128aa9c1decae83a36372548e0f78386ac3e87",
+      "git": {
+        "commit": "02b48b89ad7a1a371931fa11401cd7e7e798d680",
+        "dirty": false,
+        "dirty_files": []
+      },
+      "dfc_version": "3.33.1"
+    }
+  }
+}
