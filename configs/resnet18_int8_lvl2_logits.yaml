@@ -1,0 +1,20 @@
+# TF1 (Exposé V2): Durchsatzkosten des Zugriffs auf Zwischenaktivierungen (10.11.2026).
+# Identisch zu resnet18_int8_lvl2.yaml, aber nur der Logit-Ausgang (keine Feature-Map) → Layer-Fusion bleibt intakt.
+# Messung auf dem Pi: hailortcli benchmark gegen das HEF von resnet18_int8_lvl2 (mit Feature-Map),
+# dazu thesis-edge-run --limit 200 für die Host-Latenz. FPS-Unterschied = Kosten des Feature-Ausgangs.
+name: resnet18_int8_lvl2_logits
+model: resnet18
+precision: int8
+subset: imagenet_eval_48000.txt
+calib_subset: imagenet_calib_2000_seed1.txt
+calib_size: 1024                  # = Finetune-Default (dataset_size) und Mindestmenge für Stufe 2 (Doku MO S. 7); DFC kalibriert mit den ersten 64. Mehr bringt numerisch nichts, kostet aber RAM (float32: 1024 ≈ 0,6 GB)
+onnx: onnx/resnet18.onnx
+hef: resnet18_int8_lvl2_logits/resnet18.hef
+end_node_names:
+  - "/fc/Gemm"
+normalize_on_chip: true
+optimization_level: 2
+warmup_iters: 50
+repeats: 1
+save_features: false
+notes: "TF1: Durchsatzkosten – HEF nur mit Logits (Vergleich zu resnet18_int8_lvl2)"

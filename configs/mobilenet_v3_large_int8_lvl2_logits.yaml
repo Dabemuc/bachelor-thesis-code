@@ -1,0 +1,20 @@
+# TF1 (Exposé V2): Durchsatzkosten des Zugriffs auf Zwischenaktivierungen (10.11.2026).
+# Identisch zu mobilenet_v3_large_int8_lvl2.yaml, aber nur der Logit-Ausgang (keine Feature-Map) → Layer-Fusion bleibt intakt.
+# Messung auf dem Pi: hailortcli benchmark gegen das HEF von mobilenet_v3_large_int8_lvl2 (mit Feature-Map),
+# dazu thesis-edge-run --limit 200 für die Host-Latenz. FPS-Unterschied = Kosten des Feature-Ausgangs.
+name: mobilenet_v3_large_int8_lvl2_logits
+model: mobilenet_v3_large
+precision: int8
+subset: imagenet_eval_48000.txt
+calib_subset: imagenet_calib_2000_seed1.txt
+calib_size: 1024
+onnx: onnx/mobilenet_v3_large.onnx
+hef: mobilenet_v3_large_int8_lvl2_logits/mobilenet_v3_large.hef
+end_node_names:
+  - "/classifier/classifier.3/Gemm"
+normalize_on_chip: true
+optimization_level: 2
+warmup_iters: 50
+repeats: 1
+save_features: false
+notes: "TF1: Durchsatzkosten – HEF nur mit Logits (Vergleich zu mobilenet_v3_large_int8_lvl2)"
