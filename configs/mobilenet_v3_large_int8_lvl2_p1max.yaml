@@ -1,0 +1,24 @@
+# P1 (Kompilierstufe = Numerik?), neu 16.11.2026: Nur Kompilierschritt aus dem quantisierten HAR
+# von Compile A (mobilenet_v3_large_int8_lvl2) – Quantisierung identisch, damit ist der Compile-Zufall (P3) ausgeschaltet.
+# Variante: compiler_optimization_level=max.
+# Auswertung: out_sha1/Logits/Features je Bild gegen mobilenet_v3_large_int8_lvl2 (Compile A) und gegen die jeweils andere
+# P1-Variante; zusätzlich hailortcli benchmark (FPS).
+name: mobilenet_v3_large_int8_lvl2_p1max
+model: mobilenet_v3_large
+precision: int8
+subset: imagenet_eval_48000.txt
+calib_subset: imagenet_calib_2000_seed1.txt
+calib_size: 1024
+onnx: onnx/mobilenet_v3_large.onnx
+hef: mobilenet_v3_large_int8_lvl2_p1max/mobilenet_v3_large.hef
+from_har: mobilenet_v3_large_int8_lvl2/mobilenet_v3_large_quantized.har   # quantisiertes HAR von Compile A
+end_node_names:
+  - "/features/features.16/features.16.2/Mul"
+  - "/classifier/classifier.3/Gemm"
+model_script:
+  - "performance_param(compiler_optimization_level=max)"
+normalize_on_chip: true
+warmup_iters: 50
+repeats: 1
+save_features: true
+notes: "P1: compiler_optimization_level=max"

@@ -49,6 +49,12 @@ class ExperimentConfig:
     #   - "model_optimization_config(compression_params, auto_4bit_weights_ratio=0.6)"
     #   - "performance_param(compiler_optimization_level=max)"
     model_script: list[str] = field(default_factory=list)
+    # Optional: nur kompilieren, ausgehend von einem vorhandenen quantisierten HAR (Pfad relativ
+    # zu artifacts/). Parsen und Quantisierung entfallen, die Numerik stammt aus diesem HAR.
+    # Für P1 (Kompilierstufe): derselbe HAR einmal mit Default, einmal mit
+    # performance_param(compiler_optimization_level=max) kompilieren. Erlaubt sind dann nur
+    # performance_param-Zeilen im model_script (DFC 3.33.1, client_runner.py load_model_script).
+    from_har: str | None = None
     warmup_iters: int = 50
     repeats: int = 1                 # Wiederholungen des Subset-Durchlaufs (Hailo ist nicht deterministisch)
     save_features: bool = True       # Feature-Maps der CAM-Schicht mitschreiben
@@ -65,6 +71,10 @@ class ExperimentConfig:
     @property
     def onnx_path(self) -> Path | None:
         return ARTIFACTS_DIR / self.onnx if self.onnx else None
+
+    @property
+    def from_har_path(self) -> Path | None:
+        return ARTIFACTS_DIR / self.from_har if self.from_har else None
 
     @property
     def hef_path(self) -> Path | None:

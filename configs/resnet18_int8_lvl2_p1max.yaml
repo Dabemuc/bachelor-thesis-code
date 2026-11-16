@@ -1,22 +1,24 @@
-# P1 (Kompilierstufe = Numerik?): wie resnet18_int8_lvl2.yaml + compiler_optimization_level=max.
-# out_sha1 je Bild mit resnet18_int8_lvl2 vergleichen; zusätzlich `hailortcli benchmark` beider HEFs.
-# ⚠️ Nur sauber interpretierbar, wenn P3 zeigt, dass zwei Compiles derselben Config gleich sind.
+# P1 (Kompilierstufe = Numerik?), neu 16.11.2026: Nur Kompilierschritt aus dem quantisierten HAR
+# von Compile A (resnet18_int8_lvl2) – Quantisierung identisch, damit ist der Compile-Zufall (P3) ausgeschaltet.
+# Variante: compiler_optimization_level=max.
+# Auswertung: out_sha1/Logits/Features je Bild gegen resnet18_int8_lvl2 (Compile A) und gegen die jeweils andere
+# P1-Variante; zusätzlich hailortcli benchmark (FPS).
 name: resnet18_int8_lvl2_p1max
 model: resnet18
 precision: int8
 subset: imagenet_eval_48000.txt
 calib_subset: imagenet_calib_2000_seed1.txt
-calib_size: 1024
+calib_size: 1024                  # = Finetune-Default (dataset_size) und Mindestmenge für Stufe 2 (Doku MO S. 7); DFC kalibriert mit den ersten 64. Mehr bringt numerisch nichts, kostet aber RAM (float32: 1024 ≈ 0,6 GB)
 onnx: onnx/resnet18.onnx
 hef: resnet18_int8_lvl2_p1max/resnet18.hef
-end_node_names:
+from_har: resnet18_int8_lvl2/resnet18_quantized.har   # quantisiertes HAR von Compile A
+end_node_names:                   # wie resnet18_int8.yaml (AP0, 23.09.2026)
   - "/layer4/layer4.1/relu_1/Relu"
   - "/fc/Gemm"
-normalize_on_chip: true
-optimization_level: 2
 model_script:
   - "performance_param(compiler_optimization_level=max)"
+normalize_on_chip: true
 warmup_iters: 50
 repeats: 1
 save_features: true
-notes: "Phase 1: P1"
+notes: "P1: compiler_optimization_level=max"

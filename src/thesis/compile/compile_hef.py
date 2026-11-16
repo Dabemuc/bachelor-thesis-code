@@ -12,6 +12,12 @@ Schritte (DFC-Python-API, ``ClientRunner``):
     3. optimize(calib)       – Post-Training-Quantisierung mit Kalibrierdaten.
     4. compile()             – HEF erzeugen.
 
+Variante ``from_har`` in der Config (P1, 16.11.2026): Schritte 1–3 entfallen, der Runner
+lädt ein vorhandenes quantisiertes HAR und kompiliert nur. ``performance_param``-Zeilen aus
+``model_script`` werden per ``load_model_script(..., append=True)`` angehängt; der DFC erlaubt
+das im quantisierten Zustand ausschließlich für
+``performance_param(compiler_optimization_level=max)``.
+
 Zwischenstände (HAR) werden mitgespeichert: das quantisierte HAR ist die
 Grundlage für Emulator-Läufe (SDK_QUANTIZED) und Layer-Analysen (TF4).
 
@@ -144,6 +150,39 @@ def _copy_core_log(out_dir: Path, config: str) -> None:
         print(f"Hinweis: {core} gehört nicht zu diesem Lauf, nicht kopiert.", file=sys.stderr)
 
 
+def _compile_from_har(cfg, out_dir: Path, args, ClientRunner) -> None:  # noqa: N803
+    """Nur Kompilierschritt aus einem vorhandenen quantisierten HAR (P1)."""
+    har = cfg.from_har_path
+    if har is None or not har.exists():
+        sys.exit(f"HAR fehlt: {har}")
+    other = [l for l in cfg.model_script if not l.strip().startswith("performance_param")]
+    if other or cfg.optimization_level is not None:
+        sys.exit("from_har: nur performance_param-Zeilen erlaubt (Quantisierung steckt im HAR); "
+                 f"optimization_level/model_script entfernen: {other}")
+    har_sha = sha256_file(har)
+    runner = ClientRunner(hw_arch=args.hw_arch, har=str(har))
+    print(f"HAR geladen: {har} (sha256 {har_sha[:12]}…), Zustand {runner.state}")
+    for line in cfg.model_script:
+        runner.load_model_script(line, append=True)
+        print(f"angehängt: {line}")
+    hef = runner.compile()
+    hef_path = out_dir / f"{cfg.model}.hef"
+    hef_path.write_bytes(hef)
+    (out_dir / "compile_meta.json").write_text(json.dumps({
+        "created": datetime.now().isoformat(timespec="seconds"),
+        "hw_arch": args.hw_arch,
+        "from_har": str(cfg.from_har),
+        "from_har_sha256": har_sha,
+        "model_script": list(cfg.model_script),
+        "hef_sha256": sha256_file(hef_path),
+        "git": git_state(),
+        "packages": package_versions(),
+        "config": dataclasses.asdict(cfg),
+    }, indent=2, ensure_ascii=False), encoding="utf-8")
+    _copy_core_log(out_dir, args.config)
+    print(f"HEF → {hef_path}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="ONNX → HEF (Hailo-8)")
     ap.add_argument("config")
@@ -159,10 +198,13 @@ def main() -> None:
         sys.exit("hailo_sdk_client fehlt – dieses Skript läuft nur im DFC-Container (x86_64).")
 
     cfg = load_config(args.config)
-    if not cfg.onnx_path or not cfg.onnx_path.exists():
-        sys.exit(f"ONNX fehlt: {cfg.onnx_path}")
     out_dir = ARTIFACTS_DIR / cfg.name
     out_dir.mkdir(parents=True, exist_ok=True)
+    if cfg.from_har:
+        _compile_from_har(cfg, out_dir, args, ClientRunner)
+        return
+    if not cfg.onnx_path or not cfg.onnx_path.exists():
+        sys.exit(f"ONNX fehlt: {cfg.onnx_path}")
 
     runner = ClientRunner(hw_arch=args.hw_arch)
     runner.translate_onnx_model(
