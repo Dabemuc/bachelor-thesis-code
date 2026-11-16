@@ -1,0 +1,70 @@
+{
+  "started": "2026-11-16T22:13:09",
+  "host": "Lee",
+  "platform": "Linux-6.18.50+rpt-rpi-2712-aarch64-with-glibc2.41",
+  "machine": "aarch64",
+  "python": "3.13.5",
+  "git": {
+    "commit": "52b869dfdd78e8f545eef37185cbfeda149e8f4b",
+    "dirty": false,
+    "dirty_files": []
+  },
+  "packages": {
+    "numpy": "2.5.3",
+    "torch": null,
+    "onnx": null,
+    "hailort": "4.23.0",
+    "hailo-dataflow-compiler": null,
+    "hailort (dpkg)": "4.23.0"
+  },
+  "config": {
+    "name": "resnet18_int8_lvl2_p1max",
+    "model": "resnet18",
+    "precision": "int8",
+    "subset": "imagenet_eval_48000.txt",
+    "onnx": "onnx/resnet18.onnx",
+    "hef": "resnet18_int8_lvl2_p1max/resnet18.hef",
+    "end_node_names": [
+      "/layer4/layer4.1/relu_1/Relu",
+      "/fc/Gemm"
+    ],
+    "normalize_on_chip": true,
+    "calib_subset": "imagenet_calib_2000_seed1.txt",
+    "calib_size": 1024,
+    "optimization_level": null,
+    "model_script": [
+      "performance_param(compiler_optimization_level=max)"
+    ],
+    "from_har": "resnet18_int8_lvl2/resnet18_quantized.har",
+    "warmup_iters": 50,
+    "repeats": 1,
+    "save_features": true,
+    "notes": "P1: compiler_optimization_level=max"
+  },
+  "n_images": 200,
+  "offset": 0,
+  "role": "edge",
+  "hef": {
+    "path": "/home/pi/bachelor-thesis-code/artifacts/resnet18_int8_lvl2_p1max/resnet18.hef",
+    "sha256": "6f0453276912e644edd42ef944a4774528d626cecb12bd167e7742b0cb036e28",
+    "compile_meta": {
+      "created": "2026-11-16T20:34:22",
+      "hw_arch": "hailo8",
+      "model_script": [
+        "performance_param(compiler_optimization_level=max)"
+      ],
+      "calib_n": null,
+      "calib_array_n": null,
+      "onnx_sha256": null,
+      "hef_sha256": "6f0453276912e644edd42ef944a4774528d626cecb12bd167e7742b0cb036e28",
+      "git": {
+        "commit": "4dbfb914b5c4b13a9217a280ee33c2110050c260",
+        "dirty": false,
+        "dirty_files": []
+      },
+      "from_har": "resnet18_int8_lvl2/resnet18_quantized.har",
+      "from_har_sha256": "276d0630ff5ffb5fa28682482e8ed70bd126732d021cf9399446975fdcbb688b",
+      "dfc_version": "3.33.1"
+    }
+  }
+}

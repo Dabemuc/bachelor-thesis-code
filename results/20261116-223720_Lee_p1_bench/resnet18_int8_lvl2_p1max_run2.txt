@@ -1,0 +1,56 @@
+Starting Measurements...
+Measuring FPS in HW-only mode
+Network resnet18/resnet18: 6% | 2688 | FPS: 2685.35 | ETA: 00:00:14
+[F[2KNetwork resnet18/resnet18: 13% | 5413 | FPS: 2703.70 | ETA: 00:00:13
+[F[2KNetwork resnet18/resnet18: 20% | 8136 | FPS: 2709.48 | ETA: 00:00:12
+[F[2KNetwork resnet18/resnet18: 26% | 10860 | FPS: 2712.41 | ETA: 00:00:11
+[F[2KNetwork resnet18/resnet18: 33% | 13584 | FPS: 2714.16 | ETA: 00:00:10
+[F[2KNetwork resnet18/resnet18: 40% | 16308 | FPS: 2715.33 | ETA: 00:00:09
+[F[2KNetwork resnet18/resnet18: 46% | 19031 | FPS: 2716.02 | ETA: 00:00:08
+[F[2KNetwork resnet18/resnet18: 53% | 21754 | FPS: 2716.53 | ETA: 00:00:07
+[F[2KNetwork resnet18/resnet18: 60% | 24477 | FPS: 2716.93 | ETA: 00:00:06
+[F[2KNetwork resnet18/resnet18: 66% | 27200 | FPS: 2717.26 | ETA: 00:00:05
+[F[2KNetwork resnet18/resnet18: 73% | 29922 | FPS: 2717.52 | ETA: 00:00:04
+[F[2KNetwork resnet18/resnet18: 80% | 32645 | FPS: 2717.74 | ETA: 00:00:03
+[F[2KNetwork resnet18/resnet18: 86% | 35368 | FPS: 2717.93 | ETA: 00:00:02
+[F[2KNetwork resnet18/resnet18: 93% | 38091 | FPS: 2718.09 | ETA: 00:00:01
+[F[2KNetwork resnet18/resnet18: 100% | 40773 | FPS: 2717.18 | ETA: 00:00:00
+Measuring FPS (and Power on supported platforms) in streaming mode
+Network resnet18/resnet18: 6% | 2689 | FPS: 2686.37 | ETA: 00:00:14
+[F[2KNetwork resnet18/resnet18: 13% | 5414 | FPS: 2704.17 | ETA: 00:00:13
+[F[2KNetwork resnet18/resnet18: 20% | 8137 | FPS: 2709.80 | ETA: 00:00:12
+[F[2KNetwork resnet18/resnet18: 26% | 10861 | FPS: 2712.65 | ETA: 00:00:11
+[F[2KNetwork resnet18/resnet18: 33% | 13585 | FPS: 2714.35 | ETA: 00:00:10
+[F[2KNetwork resnet18/resnet18: 40% | 16309 | FPS: 2715.50 | ETA: 00:00:09
+[F[2KNetwork resnet18/resnet18: 46% | 19032 | FPS: 2716.22 | ETA: 00:00:08
+[F[2KNetwork resnet18/resnet18: 53% | 21755 | FPS: 2716.71 | ETA: 00:00:07
+[F[2KNetwork resnet18/resnet18: 60% | 24478 | FPS: 2717.10 | ETA: 00:00:06
+[F[2KNetwork resnet18/resnet18: 66% | 27201 | FPS: 2717.41 | ETA: 00:00:05
+[F[2KNetwork resnet18/resnet18: 73% | 29923 | FPS: 2717.60 | ETA: 00:00:04
+[F[2KNetwork resnet18/resnet18: 80% | 32646 | FPS: 2717.82 | ETA: 00:00:03
+[F[2KNetwork resnet18/resnet18: 86% | 35369 | FPS: 2718.00 | ETA: 00:00:02
+[F[2KNetwork resnet18/resnet18: 93% | 38092 | FPS: 2718.16 | ETA: 00:00:01
+[F[2KNetwork resnet18/resnet18: 100% | 40775 | FPS: 2717.31 | ETA: 00:00:00
+Measuring HW Latency
+Network resnet18/resnet18: 6% | 760 | HW Latency: 1.24 ms | ETA: 00:00:14
+[F[2KNetwork resnet18/resnet18: 13% | 1527 | HW Latency: 1.24 ms | ETA: 00:00:13
+[F[2KNetwork resnet18/resnet18: 20% | 2294 | HW Latency: 1.24 ms | ETA: 00:00:12
+[F[2KNetwork resnet18/resnet18: 26% | 3062 | HW Latency: 1.24 ms | ETA: 00:00:11
+[F[2KNetwork resnet18/resnet18: 33% | 3831 | HW Latency: 1.23 ms | ETA: 00:00:10
+[F[2KNetwork resnet18/resnet18: 40% | 4599 | HW Latency: 1.23 ms | ETA: 00:00:09
+[F[2KNetwork resnet18/resnet18: 46% | 5367 | HW Latency: 1.23 ms | ETA: 00:00:08
+[F[2KNetwork resnet18/resnet18: 53% | 6135 | HW Latency: 1.23 ms | ETA: 00:00:07
+[F[2KNetwork resnet18/resnet18: 60% | 6903 | HW Latency: 1.23 ms | ETA: 00:00:06
+[F[2KNetwork resnet18/resnet18: 66% | 7668 | HW Latency: 1.23 ms | ETA: 00:00:05
+[F[2KNetwork resnet18/resnet18: 73% | 8436 | HW Latency: 1.23 ms | ETA: 00:00:04
+[F[2KNetwork resnet18/resnet18: 80% | 9203 | HW Latency: 1.23 ms | ETA: 00:00:03
+[F[2KNetwork resnet18/resnet18: 86% | 9972 | HW Latency: 1.23 ms | ETA: 00:00:02
+[F[2KNetwork resnet18/resnet18: 93% | 10739 | HW Latency: 1.23 ms | ETA: 00:00:01
+[F[2KNetwork resnet18/resnet18: 100% | 11493 | HW Latency: 1.23 ms | ETA: 00:00:00
+
+=======
+Summary
+=======
+FPS     (hw_only)                 = 2717.19
+        (streaming)               = 2717.26
+Latency (hw)                      = 1.23385 ms
