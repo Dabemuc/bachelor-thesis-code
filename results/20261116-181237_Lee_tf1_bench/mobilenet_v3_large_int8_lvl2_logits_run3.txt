@@ -1,0 +1,56 @@
+Starting Measurements...
+Measuring FPS in HW-only mode
+Network mobilenet_v3_large/mobilenet_v3_large: 6% | 994 | FPS: 993.01 | ETA: 00:00:14
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 13% | 1997 | FPS: 997.46 | ETA: 00:00:13
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 20% | 3001 | FPS: 999.30 | ETA: 00:00:12
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 26% | 4004 | FPS: 999.96 | ETA: 00:00:11
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 33% | 5008 | FPS: 1000.56 | ETA: 00:00:10
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 40% | 6011 | FPS: 1000.79 | ETA: 00:00:09
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 46% | 7015 | FPS: 1001.10 | ETA: 00:00:08
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 53% | 8018 | FPS: 1001.31 | ETA: 00:00:07
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 60% | 9021 | FPS: 1001.38 | ETA: 00:00:06
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 66% | 10025 | FPS: 1001.54 | ETA: 00:00:05
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 73% | 11028 | FPS: 1001.58 | ETA: 00:00:04
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 80% | 12032 | FPS: 1001.70 | ETA: 00:00:03
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 86% | 13035 | FPS: 1001.72 | ETA: 00:00:02
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 93% | 14039 | FPS: 1001.81 | ETA: 00:00:01
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 100% | 15028 | FPS: 1001.48 | ETA: 00:00:00
+Measuring FPS (and Power on supported platforms) in streaming mode
+Network mobilenet_v3_large/mobilenet_v3_large: 6% | 994 | FPS: 993.03 | ETA: 00:00:14
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 13% | 1997 | FPS: 997.47 | ETA: 00:00:13
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 20% | 3001 | FPS: 999.30 | ETA: 00:00:12
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 26% | 4004 | FPS: 999.97 | ETA: 00:00:11
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 33% | 5008 | FPS: 1000.60 | ETA: 00:00:10
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 40% | 6011 | FPS: 1000.83 | ETA: 00:00:09
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 46% | 7015 | FPS: 1001.13 | ETA: 00:00:08
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 53% | 8019 | FPS: 1001.36 | ETA: 00:00:07
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 60% | 9022 | FPS: 1001.44 | ETA: 00:00:06
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 66% | 10026 | FPS: 1001.60 | ETA: 00:00:05
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 73% | 11029 | FPS: 1001.63 | ETA: 00:00:04
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 80% | 12033 | FPS: 1001.74 | ETA: 00:00:03
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 86% | 13036 | FPS: 1001.77 | ETA: 00:00:02
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 93% | 14040 | FPS: 1001.85 | ETA: 00:00:01
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 100% | 15028 | FPS: 1001.48 | ETA: 00:00:00
+Measuring HW Latency
+Network mobilenet_v3_large/mobilenet_v3_large: 6% | 110 | HW Latency: 8.99 ms | ETA: 00:00:14
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 13% | 220 | HW Latency: 8.99 ms | ETA: 00:00:13
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 20% | 330 | HW Latency: 8.99 ms | ETA: 00:00:12
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 26% | 441 | HW Latency: 8.99 ms | ETA: 00:00:11
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 33% | 551 | HW Latency: 8.99 ms | ETA: 00:00:10
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 40% | 661 | HW Latency: 8.99 ms | ETA: 00:00:09
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 46% | 772 | HW Latency: 8.99 ms | ETA: 00:00:08
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 53% | 882 | HW Latency: 8.99 ms | ETA: 00:00:07
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 60% | 993 | HW Latency: 8.99 ms | ETA: 00:00:06
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 66% | 1103 | HW Latency: 8.99 ms | ETA: 00:00:05
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 73% | 1213 | HW Latency: 8.99 ms | ETA: 00:00:04
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 80% | 1324 | HW Latency: 8.99 ms | ETA: 00:00:03
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 86% | 1434 | HW Latency: 8.99 ms | ETA: 00:00:02
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 93% | 1544 | HW Latency: 8.99 ms | ETA: 00:00:01
+[F[2KNetwork mobilenet_v3_large/mobilenet_v3_large: 100% | 1653 | HW Latency: 8.99 ms | ETA: 00:00:00
+
+=======
+Summary
+=======
+FPS     (hw_only)                 = 1001.49
+        (streaming)               = 1001.48
+Latency (hw)                      = 8.9919 ms
