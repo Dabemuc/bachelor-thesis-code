@@ -1,0 +1,20 @@
+# Kern (Phase 2), Compile 3 von 10 – erzeugt mit scripts/make_kern_configs.py am 16.11.2026.
+# Identisch zu configs/mobilenet_v3_large_int8_lvl2.yaml (DFC-Stufe 2, Kalibrierung 64 = DFC-Default, Default-Kompilierstufe)
+# bis auf name, hef und repeats/notes. Die 10 Compiles unterscheiden sich nur durch den Finetune-Zufall (P3).
+name: mobilenet_v3_large_int8_lvl2_k03
+model: mobilenet_v3_large
+precision: int8
+subset: imagenet_eval_48000.txt
+calib_subset: imagenet_calib_2000_seed1.txt
+calib_size: 1024
+onnx: onnx/mobilenet_v3_large.onnx
+hef: mobilenet_v3_large_int8_lvl2_k03/mobilenet_v3_large.hef
+end_node_names:
+  - "/features/features.16/features.16.2/Mul"
+  - "/classifier/classifier.3/Gemm"
+normalize_on_chip: true
+optimization_level: 2
+warmup_iters: 50
+repeats: 1
+save_features: true
+notes: "Kern (Phase 2): Compile 3/10, identisch zu mobilenet_v3_large_int8_lvl2.yaml bis auf Name/HEF-Pfad"

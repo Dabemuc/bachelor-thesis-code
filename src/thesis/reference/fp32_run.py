@@ -48,6 +48,10 @@ def main() -> None:
     ap.add_argument("config")
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--limit", type=int, default=None)
+    ap.add_argument("--offset", type=int, default=0,
+                    help="ab Bild Nr. OFFSET des Subsets beginnen (große Läufe in Blöcken, z. B. 48 000 = 8 × 6000)")
+    ap.add_argument("--subset", default=None,
+                    help="Subset-Datei (relativ zu data/subsets/) statt der aus der Config, z. B. imagenet_eval_strat5000_seed2.txt")
     ap.add_argument("--gradients", action="store_true",
                     help="zusätzlich d logit[target] / d Feature-Map speichern (gradients.npz)")
     ap.add_argument("--target-run", type=Path, default=None,
@@ -55,7 +59,10 @@ def main() -> None:
     args = ap.parse_args()
 
     cfg = load_config(args.config)
-    items = read_subset(cfg.subset_path)[: args.limit]
+    if args.subset:
+        cfg.subset = args.subset  # landet so auch in meta.json → config.subset
+    end = None if args.limit is None else args.offset + args.limit
+    items = read_subset(cfg.subset_path)[args.offset:end]
     fn_name, weights_name = MODELS[cfg.model]
     model = getattr(tvm, fn_name)(weights=getattr(tvm, weights_name).IMAGENET1K_V1).eval().to(args.device)
 
@@ -76,7 +83,7 @@ def main() -> None:
             raise SystemExit(f"{len(lacking)} Bilder fehlen in {run}/predictions.csv, z. B. {lacking[0]}")
 
     write_meta(run_dir, cfg, extra={
-        "n_images": len(items), "role": "reference", "device": args.device,
+        "n_images": len(items), "offset": args.offset, "role": "reference", "device": args.device,
         "gradients": args.gradients,
         "target_run": str(args.target_run) if args.target_run else None,
         "cam_layer": CAM_LAYER[cfg.model],

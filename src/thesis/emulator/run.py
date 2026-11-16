@@ -136,6 +136,7 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
         run_dir = new_run_dir(cfg, tag=f"emu_{ctx_name}")
         write_meta(run_dir, cfg, extra={
             "n_images": n,
+            "offset": args.offset,
             "role": "emulator",
             "emulator_context": str(ctx_enum),
             "har": {"path": str(har), "sha256": sha256_file(har)},
@@ -252,7 +253,11 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Quantisiertes HAR im Hailo-Emulator laufen lassen (P10+)")
     ap.add_argument("config")
-    ap.add_argument("--limit", type=int, default=None, help="nur die ersten N Bilder des Subsets")
+    ap.add_argument("--limit", type=int, default=None, help="nur N Bilder des Subsets (Smoke-Test bzw. Blockgröße)")
+    ap.add_argument("--offset", type=int, default=0,
+                    help="ab Bild Nr. OFFSET des Subsets beginnen (große Läufe in Blöcken, z. B. 48 000 = 8 × 6000)")
+    ap.add_argument("--subset", default=None,
+                    help="Subset-Datei (relativ zu data/subsets/) statt der aus der Config, z. B. imagenet_eval_strat5000_seed2.txt")
     ap.add_argument("--contexts", default="native,quantized",
                     help=f"Komma-Liste aus {', '.join(CONTEXTS)} (bit_exact ist im DFC nur „preview“)")
     ap.add_argument("--no-gradients", dest="gradients", action="store_false",
@@ -277,7 +282,10 @@ def main() -> None:
     har = ARTIFACTS_DIR / cfg.name / f"{cfg.model}_quantized.har"
     if not har.exists():
         sys.exit(f"Quantisiertes HAR fehlt: {har} (entsteht bei thesis-compile)")
-    items = read_subset(cfg.subset_path)[: args.limit]
+    if args.subset:
+        cfg.subset = args.subset  # landet so auch in meta.json → config.subset
+    end = None if args.limit is None else args.offset + args.limit
+    items = read_subset(cfg.subset_path)[args.offset:end]
     missing = [it.path for it in items if not Path(it.path).exists()]
     if missing:
         sys.exit(f"{len(missing)} Bilder fehlen, z. B. {missing[0]} → scripts/sync_subset_images.sh {cfg.subset} <ziel> {len(items)}")

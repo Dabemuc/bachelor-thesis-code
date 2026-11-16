@@ -93,17 +93,24 @@ def _classify_outputs(out: dict[str, np.ndarray], num_classes: int = 1000) -> tu
 def main() -> None:
     ap = argparse.ArgumentParser(description="HEF auf dem Hailo-8 über ein Subset laufen lassen")
     ap.add_argument("config", help="configs/<experiment>.yaml")
-    ap.add_argument("--limit", type=int, default=None, help="nur die ersten N Bilder (Smoke-Test)")
+    ap.add_argument("--limit", type=int, default=None, help="nur N Bilder (Smoke-Test bzw. Blockgröße)")
+    ap.add_argument("--offset", type=int, default=0,
+                    help="ab Bild Nr. OFFSET des Subsets beginnen (große Läufe in Blöcken, z. B. 48 000 = 8 × 6000)")
+    ap.add_argument("--subset", default=None,
+                    help="Subset-Datei (relativ zu data/subsets/) statt der aus der Config, z. B. imagenet_eval_strat5000_seed2.txt")
     args = ap.parse_args()
 
     cfg = load_config(args.config)
     if cfg.hef_path is None or not cfg.hef_path.exists():
         sys.exit(f"HEF fehlt: {cfg.hef_path}")
-    items = read_subset(cfg.subset_path)[: args.limit]
+    if args.subset:
+        cfg.subset = args.subset  # landet so auch in meta.json → config.subset
+    end = None if args.limit is None else args.offset + args.limit
+    items = read_subset(cfg.subset_path)[args.offset:end]
 
     hp = _import_hailo()
     run_dir = new_run_dir(cfg)
-    write_meta(run_dir, cfg, extra={"n_images": len(items), "role": "edge", "hef": hef_provenance(cfg.hef_path)})
+    write_meta(run_dir, cfg, extra={"n_images": len(items), "offset": args.offset, "role": "edge", "hef": hef_provenance(cfg.hef_path)})
 
     hef = hp.HEF(str(cfg.hef_path))
     with hp.VDevice() as target:

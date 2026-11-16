@@ -1,0 +1,20 @@
+# Kern (Phase 2), Compile 6 von 10 – erzeugt mit scripts/make_kern_configs.py am 16.11.2026.
+# Identisch zu configs/resnet18_int8_lvl2.yaml (DFC-Stufe 2, Kalibrierung 64 = DFC-Default, Default-Kompilierstufe)
+# bis auf name, hef und repeats/notes. Die 10 Compiles unterscheiden sich nur durch den Finetune-Zufall (P3).
+name: resnet18_int8_lvl2_k06
+model: resnet18
+precision: int8
+subset: imagenet_eval_48000.txt
+calib_subset: imagenet_calib_2000_seed1.txt
+calib_size: 1024                  # = Finetune-Default (dataset_size) und Mindestmenge für Stufe 2 (Doku MO S. 7); DFC kalibriert mit den ersten 64. Mehr bringt numerisch nichts, kostet aber RAM (float32: 1024 ≈ 0,6 GB)
+onnx: onnx/resnet18.onnx
+hef: resnet18_int8_lvl2_k06/resnet18.hef
+end_node_names:                   # wie resnet18_int8.yaml (AP0, 23.09.2026)
+  - "/layer4/layer4.1/relu_1/Relu"
+  - "/fc/Gemm"
+normalize_on_chip: true
+optimization_level: 2
+warmup_iters: 50
+repeats: 1
+save_features: true
+notes: "Kern (Phase 2): Compile 6/10, identisch zu resnet18_int8_lvl2.yaml bis auf Name/HEF-Pfad"
