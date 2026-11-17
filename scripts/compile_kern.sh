@@ -3,11 +3,11 @@
 #     bash scripts/compile_kern.sh            # alle
 #     bash scripts/compile_kern.sh resnet18   # nur Configs, deren Name das Muster enthält
 # Bereits vorhandene HEFs werden übersprungen (Wiederaufnahme nach Abbruch möglich).
-# Ein Fehler bricht nicht ab; Zusammenfassung am Ende und in logs/compile_kern_<zeit>.txt.
+# Ein Fehler bricht nicht ab; Zusammenfassung am Ende und in logs/compile_kern_<zeit>.log (gitignored).
 set -u
 cd "$(dirname "$0")/.."
 pattern="${1:-}"
-summary="logs/compile_kern_$(date +%Y%m%d-%H%M%S).txt"
+summary="logs/compile_kern_$(date +%Y%m%d-%H%M%S).log"   # .log ist gitignored, .txt machte das Repo „dirty“
 mkdir -p logs
 ok=0; skip=0; fail=0
 for cfg in configs/kern/*_k[0-9][0-9].yaml; do

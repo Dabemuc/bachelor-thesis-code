@@ -2,7 +2,7 @@
 """Prüft die Kern-Compiles (artifacts/*_kNN/) – auf dem Rechner ausführen, auf dem die Artefakte liegen:
 
     python3 scripts/check_kern_compiles.py            # Tabelle auf stdout
-    python3 scripts/check_kern_compiles.py > logs/check_kern.txt
+    python3 scripts/check_kern_compiles.py > logs/check_kern.log   # .log ist gitignored
 
 Je Compile: HEF vorhanden, SHA-256 (gekürzt), Git-Commit/dirty, Kontext-Flow (Single/Multi),
 Kalibriergröße laut Log, SNR der Ausgänge, Mapping-Auslastung, Laufzeit. Am Ende: doppelte HEF-Hashes.
