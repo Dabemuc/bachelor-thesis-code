@@ -20,7 +20,7 @@ batch() { case "$1" in mobilenet*) echo 4;; *) echo 8;; esac; }
 
 run_block() {  # cfg name subset offset limit target_offset
   local cfg=$1 name=$2 subset=$3 off=$4 lim=$5 toff=$6 tsubset=$7
-  if run=$(python3 scripts/find_run.py "$name" "$subset" "$off" --role emulator --context quantized); then
+  if run=$(python3 scripts/find_run.py "$name" "$subset" "$off" --role emulator --context quantized --need consistency.npz); then
     echo "$(date +%T) SKIP $name $subset offset=$off ($run)" | tee -a "$summary"; return
   fi
   local fp; fp=$(fp32_name "$name")

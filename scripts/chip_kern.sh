@@ -30,13 +30,13 @@ for cfg in configs/kern/*_k[0-9][0-9].yaml; do
     if grep -q "^$name $off " "$done_log"; then
       echo "$(date +%T) SKIP $name offset=$off (laut $done_log fertig)" | tee -a "$summary"; continue
     fi
-    if run=$(python3 scripts/find_run.py "$name" "$SUBSET" "$off" --role edge); then
+    if run=$(python3 scripts/find_run.py "$name" "$SUBSET" "$off" --role edge --need features.npz); then
       echo "$name $off $run" >> "$done_log"
       echo "$(date +%T) SKIP $name offset=$off ($run)" | tee -a "$summary"; continue
     fi
     echo "$(date +%T) START $name offset=$off" | tee -a "$summary"
     if thesis-edge-run "$cfg" --offset "$off" --limit "$BLOCK" \
-       && run=$(python3 scripts/find_run.py "$name" "$SUBSET" "$off" --role edge); then
+       && run=$(python3 scripts/find_run.py "$name" "$SUBSET" "$off" --role edge --need features.npz); then
       echo "$name $off $run" >> "$done_log"   # erst jetzt darf der Mac den Ordner abholen
       echo "$(date +%T) OK   $name offset=$off $(vcgencmd measure_temp) $(vcgencmd get_throttled)" | tee -a "$summary"
     else

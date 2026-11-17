@@ -191,6 +191,11 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
                     checks["target"] = "eigene top1 dieses Kontexts"
 
                 grads_all, d_log, d_feat, d_int, d_deq = [], [], [], [], []
+                # Je Bild (17.11.2026): Abweichung Keras-Durchlauf ↔ runner.infer und die Feature-Map des
+                # Keras-Durchlaufs selbst. Grund: Bei 2500 Bildern wichen beide Wege erstmals ab (max.
+                # Logits 0,85, Features 1,67), in Phase 1 (200 Bilder) waren sie bitgleich. Grad-CAM soll
+                # Aktivierungen und Gradienten aus DEMSELBEN Durchlauf nehmen → features_keras.npz.
+                img_d_log, img_d_feat, feats_keras = [], [], []
                 n_none = 0
                 prog = Progress(n, label=f"{cfg.name} emu_{ctx_name} Gradienten")
                 for s in range(0, n, args.batch_size):
@@ -212,10 +217,15 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
                     grads_all.append(_to_np(g).astype(np.float32))
                     act_np = _to_np(act).astype(np.float32)
                     # (a) gleiche Zahlen wie runner.infer?
-                    d_log.append(np.abs(_to_np(lg) - logits[s:s + args.batch_size]).max())
+                    dl = np.abs(_to_np(lg) - logits[s:s + args.batch_size]).reshape(bs, -1).max(1)
+                    d_log.append(dl.max())
+                    img_d_log.append(dl)
                     if feats is not None:
                         fb = _to_np(outs_b[i_feat])
-                        d_feat.append(np.abs(fb - feats[s:s + args.batch_size]).max())
+                        df = np.abs(fb - feats[s:s + args.batch_size]).reshape(bs, -1).max(1)
+                        d_feat.append(df.max())
+                        img_d_feat.append(df)
+                        feats_keras.append(fb.astype(np.float32))
                         # interne Schicht = Feature-Ausgang? (Ausgangsschicht nur Durchreichung/Dequantisierung?)
                         d_int.append(np.abs(act_np - fb).max())
                         d_deq.append(np.abs((act_np - zp) * scale - fb).max())
@@ -240,6 +250,17 @@ def run_context(runner, ctx_name: str, cfg, items, imgs_uint8: np.ndarray, har: 
                 checks["b_gradient_abs_mean"] = float(np.abs(grads).mean())
                 checks["b_gradient_shape"] = list(grads.shape)
                 np.savez_compressed(run_dir / "gradients.npz", ids=ids, target=tgt, gradients=grads)
+                # Konsistenz je Bild + Feature-Maps des Gradienten-Durchlaufs (für Grad-CAM)
+                il = np.concatenate(img_d_log)
+                cons = {"ids": ids, "max_abs_diff_logits": il}
+                if img_d_feat:
+                    ifeat = np.concatenate(img_d_feat)
+                    cons["max_abs_diff_features"] = ifeat
+                    checks["a_images_features_differ"] = int((ifeat > 0).sum())
+                    np.savez_compressed(run_dir / "features_keras.npz", ids=ids, features=np.concatenate(feats_keras))
+                checks["a_images_logits_differ"] = int((il > 0).sum())
+                checks["a_images_total"] = int(il.size)
+                np.savez_compressed(run_dir / "consistency.npz", **cons)
             except Exception as e:
                 checks["error"] = f"{type(e).__name__}: {e}"
                 (run_dir / "checks.json").write_text(json.dumps(checks, indent=2, ensure_ascii=False), encoding="utf-8")
