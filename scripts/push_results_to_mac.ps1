@@ -1,17 +1,22 @@
-# Tensoren (*.npz) aus results/ vom Windows-PC per scp auf den Mac kopieren.
-# Code und meta.json/CSV kommen weiter per git; *.npz sind gitignored (zu gross fuer den Kern).
+# Lauf-Ergebnisse aus results/ vom Windows-PC per scp auf den Mac kopieren (ganze Ordner).
+# Seit 17.11.2026 (Kern): ALLE Dateien eines Laufs (meta.json, CSV, checks.json, *.npz); committet
+# wird auf dem Mac, NICHT mehr auf dem PC (sonst kollidieren git und scp auf dem Mac).
 #
 #   powershell -ExecutionPolicy Bypass -File scripts\push_results_to_mac.ps1            # alle fehlenden
 #   powershell -ExecutionPolicy Bypass -File scripts\push_results_to_mac.ps1 results\<lauf> [...]
+#   ... push_results_to_mac.ps1 -NpzOnly       # altes Verhalten: nur *.npz
 #
-# Kopiert nur *.npz, die auf dem Mac noch fehlen (gleicher relativer Pfad unter results/).
+# Kopiert nur Dateien, die auf dem Mac noch fehlen (gleicher relativer Pfad unter results/).
+# Ordner, in denen in den letzten 5 Minuten noch geschrieben wurde, werden uebersprungen
+# (laufender Emulator-Block) - sonst landete eine halbe predictions.csv auf dem Mac und wuerde
+# wegen "nie ueberschreiben" spaeter nicht mehr ersetzt.
 # Bereits vorhandene Dateien werden NICHT ueberschrieben (Rohdaten werden nie veraendert).
 # Voraussetzung: Mac -> Systemeinstellungen -> Teilen -> Entfernte Anmeldung (ssh) an.
 # Mac-Ziel per Umgebungsvariable aenderbar: $env:MAC_HOST, $env:MAC_DIR
 #
 # Nur ASCII in dieser Datei: Windows PowerShell 5.1 liest UTF-8 ohne BOM als ANSI.
 
-param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Runs)
+param([switch]$NpzOnly, [Parameter(ValueFromRemainingArguments = $true)][string[]]$Runs)
 
 $ErrorActionPreference = "Stop"
 $MacHost = if ($env:MAC_HOST) { $env:MAC_HOST } else { "dbenner@roosevelt.local" }
@@ -29,20 +34,26 @@ if ($Runs -and $Runs.Count -gt 0) {
 } else {
     $dirs = Get-ChildItem $Results -Directory | Where-Object { Get-ChildItem $_.FullName -Filter *.npz -File }
 }
+$Pattern = if ($NpzOnly) { "*.npz" } else { "*" }
+$cutoff = (Get-Date).AddMinutes(-5)
+$dirs = @($dirs | Where-Object {
+    $recent = Get-ChildItem $_.FullName -File | Where-Object { $_.LastWriteTime -gt $cutoff }
+    if ($recent) { Write-Host "uebersprungen (wird noch geschrieben): $($_.Name)"; $false } else { $true }
+})
 
 # Lokale Dateien: results/<lauf>/<datei>.npz (relativ, mit /)
 $local = foreach ($d in $dirs) {
-    Get-ChildItem $d.FullName -Filter *.npz -File | ForEach-Object { "$($d.Name)/$($_.Name)" }
+    Get-ChildItem $d.FullName -Filter $Pattern -File | ForEach-Object { "$($d.Name)/$($_.Name)" }
 }
-if (-not $local) { Write-Host "Keine *.npz gefunden."; exit 0 }
+if (-not $local) { Write-Host "Keine Dateien gefunden."; exit 0 }
 
 # Was liegt schon auf dem Mac? (ein ssh-Aufruf; find statt Glob, zsh bricht bei 0 Treffern ab)
-$remote = @(ssh $MacHost "cd ~/$MacDir/results 2>/dev/null && find . -name '*.npz' | sed 's|^\./||'")
+$remote = @(ssh $MacHost "cd ~/$MacDir/results 2>/dev/null && find . -type f -name '$Pattern' | sed 's|^\./||'")
 if ($LASTEXITCODE -ne 0) { throw "ssh $MacHost fehlgeschlagen (Exit $LASTEXITCODE)" }
 $have = @{}; foreach ($f in $remote) { $have[$f.Trim()] = $true }
 
 $todo = @($local | Where-Object { -not $have.ContainsKey($_) })
-Write-Host ("{0} *.npz lokal, {1} schon auf dem Mac, {2} zu kopieren -> {3}:~/{4}/results/" -f `
+Write-Host ("{0} Dateien lokal, {1} schon auf dem Mac, {2} zu kopieren -> {3}:~/{4}/results/" -f `
     $local.Count, ($local.Count - $todo.Count), $todo.Count, $MacHost, $MacDir)
 if ($todo.Count -eq 0) { exit 0 }
 
