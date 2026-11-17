@@ -11,6 +11,9 @@
 # Voraussetzung: HEFs unter artifacts/<name>/ und alle 48 000 Bilder unter data/images/.
 set -u
 cd "$(dirname "$0")/.."
+# venv des Repos verwenden, falls nicht aktiviert (tmux-Sitzungen starten ohne)
+[[ -x .venv/bin/thesis-edge-run ]] && PATH="$PWD/.venv/bin:$PATH"
+command -v thesis-edge-run >/dev/null || { echo "thesis-edge-run nicht gefunden – venv aktivieren / pip install -e ." >&2; exit 1; }
 pattern="${1:-}"
 BLOCK=${BLOCK:-8000}
 TOTAL=48000
