@@ -2,13 +2,13 @@
 # Fertige Chip-Blöcke vom Pi auf den Mac VERSCHIEBEN – nur Ordner, die in logs/chip_kern_done.log
 # auf dem Pi stehen (also vollständig geschrieben sind), nie einen laufenden Block.
 #     scripts/pull_pi_done.sh            # einmal
-#     scripts/pull_pi_done.sh --watch    # alle 20 min, bis Strg+C
+#     scripts/pull_pi_done.sh --watch    # alle 5 min (INTERVAL), bis Strg+C
 # Wie `sync_to_pi.sh pull`: rsync --remove-source-files, nur von git nicht getrackte Dateien.
 set -euo pipefail
 PI_HOST="${PI_HOST:-lee-local}"
 PI_DIR="${PI_DIR:-~/bachelor-thesis-code}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-INTERVAL="${INTERVAL:-1200}"
+INTERVAL="${INTERVAL:-300}"   # 5 min: MobileNetV3 erzeugt ≈ 1,5 GB je 8000er-Block
 
 pull_once() {
   local list; list="$(mktemp)"
