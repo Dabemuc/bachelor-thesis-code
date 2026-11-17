@@ -7,6 +7,7 @@
 #   ... push_results_to_mac.ps1 -NpzOnly       # altes Verhalten: nur *.npz
 #
 # Kopiert nur Dateien, die auf dem Mac noch fehlen (gleicher relativer Pfad unter results/).
+# Emulator-Ordner ohne consistency.npz (seit 17.11.2026 zuletzt geschrieben) werden uebersprungen.
 # Ordner, in denen in den letzten 5 Minuten noch geschrieben wurde, werden uebersprungen
 # (laufender Emulator-Block) - sonst landete eine halbe predictions.csv auf dem Mac und wuerde
 # wegen "nie ueberschreiben" spaeter nicht mehr ersetzt.
@@ -37,6 +38,12 @@ if ($Runs -and $Runs.Count -gt 0) {
 $Pattern = if ($NpzOnly) { "*.npz" } else { "*" }
 $cutoff = (Get-Date).AddMinutes(-5)
 $dirs = @($dirs | Where-Object {
+    # Emulator-Bloecke: fertig erst mit consistency.npz (zuletzt geschrieben). Logits/Features
+    # entstehen ~20 min frueher, danach wird lange nicht geschrieben -> Zeitregel allein reicht nicht.
+    if ($_.Name -match '_emu_' -and -not (Test-Path (Join-Path $_.FullName "consistency.npz")) `
+        -and (Get-ChildItem $_.FullName -File | Where-Object { $_.LastWriteTime -gt (Get-Date "2026-11-17 18:00") })) {
+        Write-Host "uebersprungen (Emulator-Block noch nicht fertig): $($_.Name)"; return $false
+    }
     $recent = Get-ChildItem $_.FullName -File | Where-Object { $_.LastWriteTime -gt $cutoff }
     if ($recent) { Write-Host "uebersprungen (wird noch geschrieben): $($_.Name)"; $false } else { $true }
 })
