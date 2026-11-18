@@ -1,0 +1,71 @@
+{
+  "started": "2026-11-17T23:55:37",
+  "host": "Lee",
+  "platform": "Linux-6.18.50+rpt-rpi-2712-aarch64-with-glibc2.41",
+  "machine": "aarch64",
+  "python": "3.13.5",
+  "git": {
+    "commit": "b757bfe6b4f41ca844ba8919a9f2788bc833496e",
+    "dirty": false,
+    "dirty_files": []
+  },
+  "packages": {
+    "numpy": "2.5.3",
+    "torch": null,
+    "onnx": null,
+    "hailort": "4.23.0",
+    "hailo-dataflow-compiler": null,
+    "hailort (dpkg)": "4.23.0"
+  },
+  "config": {
+    "name": "resnet18_int8_lvl2_k07",
+    "model": "resnet18",
+    "precision": "int8",
+    "subset": "imagenet_eval_48000.txt",
+    "onnx": "onnx/resnet18.onnx",
+    "hef": "resnet18_int8_lvl2_k07/resnet18.hef",
+    "end_node_names": [
+      "/layer4/layer4.1/relu_1/Relu",
+      "/fc/Gemm"
+    ],
+    "normalize_on_chip": true,
+    "calib_subset": "imagenet_calib_2000_seed1.txt",
+    "calib_size": 1024,
+    "optimization_level": 2,
+    "model_script": [],
+    "from_har": null,
+    "warmup_iters": 50,
+    "repeats": 1,
+    "save_features": true,
+    "notes": "Kern (Phase 2): Compile 7/10, identisch zu resnet18_int8_lvl2.yaml bis auf Name/HEF-Pfad"
+  },
+  "n_images": 8000,
+  "offset": 40000,
+  "role": "edge",
+  "hef": {
+    "path": "/home/pi/bachelor-thesis-code/artifacts/resnet18_int8_lvl2_k07/resnet18.hef",
+    "sha256": "385e739c1584046186b950fa2d25afcaa763658b4cafc97a39b4079da77b9069",
+    "compile_meta": {
+      "created": "2026-11-17T01:32:36",
+      "hw_arch": "hailo8",
+      "model_script": [
+        "normalization1 = normalization([123.675, 116.28, 103.53], [58.395, 57.120000000000005, 57.375])",
+        "model_optimization_flavor(optimization_level=2)"
+      ],
+      "calib_n": null,
+      "calib_array_n": 1024,
+      "onnx_sha256": "1cfe2538e1da6dc19ad3b94dec8248b8b06591274018a96d17a29c4877329add",
+      "hef_sha256": "385e739c1584046186b950fa2d25afcaa763658b4cafc97a39b4079da77b9069",
+      "git": {
+        "commit": "a8244232649d12d84383aec9fe4626cefa409c6f",
+        "dirty": true,
+        "dirty_files": [
+          "?? logs/"
+        ]
+      },
+      "from_har": null,
+      "from_har_sha256": null,
+      "dfc_version": "3.33.1"
+    }
+  }
+}
