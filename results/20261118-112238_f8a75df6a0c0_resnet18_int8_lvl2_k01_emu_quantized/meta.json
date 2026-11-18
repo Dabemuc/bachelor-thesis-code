@@ -1,0 +1,76 @@
+{
+  "started": "2026-11-18T11:22:39",
+  "host": "f8a75df6a0c0",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "machine": "x86_64",
+  "python": "3.10.12",
+  "git": {
+    "commit": "f22c6f5daf032b9d74749fca7dff7296380e8bbb",
+    "dirty": false,
+    "dirty_files": []
+  },
+  "packages": {
+    "numpy": "1.26.4",
+    "torch": null,
+    "onnx": "1.16.0",
+    "hailort": null,
+    "hailo-dataflow-compiler": "3.33.1"
+  },
+  "config": {
+    "name": "resnet18_int8_lvl2_k01",
+    "model": "resnet18",
+    "precision": "int8",
+    "subset": "imagenet_eval_48000.txt",
+    "onnx": "onnx/resnet18.onnx",
+    "hef": "resnet18_int8_lvl2_k01/resnet18.hef",
+    "end_node_names": [
+      "/layer4/layer4.1/relu_1/Relu",
+      "/fc/Gemm"
+    ],
+    "normalize_on_chip": true,
+    "calib_subset": "imagenet_calib_2000_seed1.txt",
+    "calib_size": 1024,
+    "optimization_level": 2,
+    "model_script": [],
+    "from_har": null,
+    "warmup_iters": 50,
+    "repeats": 1,
+    "save_features": true,
+    "notes": "Kern (Phase 2): Compile 1/10, identisch zu resnet18_int8_lvl2.yaml bis auf Name/HEF-Pfad"
+  },
+  "n_images": 3000,
+  "offset": 18000,
+  "role": "emulator",
+  "emulator_context": "sdk_quantized",
+  "har": {
+    "path": "/work/artifacts/resnet18_int8_lvl2_k01/resnet18_quantized.har",
+    "sha256": "74d89f0307ab5a3abf6c64ee8e2a2a5831f074753ea5355d9c179e9fdd241af4"
+  },
+  "hef": {
+    "path": "/work/artifacts/resnet18_int8_lvl2_k01/resnet18.hef",
+    "sha256": "e4037a746094af67beda64960d596f18082e13c955b20e26cd6531a2be30ecce",
+    "compile_meta": {
+      "created": "2026-11-17T00:32:31",
+      "hw_arch": "hailo8",
+      "model_script": [
+        "normalization1 = normalization([123.675, 116.28, 103.53], [58.395, 57.120000000000005, 57.375])",
+        "model_optimization_flavor(optimization_level=2)"
+      ],
+      "calib_n": null,
+      "calib_array_n": 1024,
+      "onnx_sha256": "1cfe2538e1da6dc19ad3b94dec8248b8b06591274018a96d17a29c4877329add",
+      "hef_sha256": "e4037a746094af67beda64960d596f18082e13c955b20e26cd6531a2be30ecce",
+      "git": {
+        "commit": "a8244232649d12d84383aec9fe4626cefa409c6f",
+        "dirty": true,
+        "dirty_files": [
+          "?? logs/"
+        ]
+      },
+      "from_har": null,
+      "from_har_sha256": null,
+      "dfc_version": "3.33.1"
+    }
+  },
+  "target_run": "results/20261116-210849_roosevelt_resnet18_fp32_imagenet"
+}
