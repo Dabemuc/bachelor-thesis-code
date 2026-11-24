@@ -1,0 +1,52 @@
+{
+  "erzeugt": "2026-11-24 18:12",
+  "code": {
+    "commit": "bf7a082",
+    "dirty": false,
+    "dirty_files": [],
+    "notebooks_geändert": [
+      "notebooks/00_daten.ipynb",
+      "notebooks/tabellen_manifest.json"
+    ],
+    "plan_tag": "65a6639",
+    "zeit": "2026-11-24 18:12"
+  },
+  "tabellen": {
+    "aktivierung_mobilenet_v3_large.parquet": {
+      "sha256": "36d67890a14550399eccec7b1b99e86873731f1f50a42f5ca50e94dd4d619253",
+      "zeilen": 98000,
+      "bytes": 2366198,
+      "geändert": "2026-11-24 17:50"
+    },
+    "aktivierung_resnet18.parquet": {
+      "sha256": "4bf39e7ae0e58ff6ef2363189585df47478fc3b13f9ff51b516e5caf5f62b00d",
+      "zeilen": 98000,
+      "bytes": 2426511,
+      "geändert": "2026-11-24 17:33"
+    },
+    "quellen_mobilenet_v3_large.parquet": {
+      "sha256": "99cf6157df3cd319ac189347fc06bce234a71141d54e918bd414c6666e856f60",
+      "zeilen": 626000,
+      "bytes": 17878439,
+      "geändert": "2026-11-24 17:50"
+    },
+    "quellen_resnet18.parquet": {
+      "sha256": "5ccfd88cd460404625f07a022a6447d3ce6bdc28b09a307cad2f7dabd94f26f2",
+      "zeilen": 626000,
+      "bytes": 18117079,
+      "geändert": "2026-11-24 17:33"
+    },
+    "vergleiche_mobilenet_v3_large.parquet": {
+      "sha256": "376328f46042d6ab56f1b1c74cd9c982d70b8d2d3f6b802cb06eebed1cbcc4c8",
+      "zeilen": 3384000,
+      "bytes": 94400699,
+      "geändert": "2026-11-24 18:07"
+    },
+    "vergleiche_resnet18.parquet": {
+      "sha256": "5eb4096b721ed33333353fbf915308fe97d885e3eb2c6b4b878e53eb14565ffc",
+      "zeilen": 3384000,
+      "bytes": 93158550,
+      "geändert": "2026-11-24 17:50"
+    }
+  }
+}
