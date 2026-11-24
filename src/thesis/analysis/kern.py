@@ -589,6 +589,12 @@ def provenance() -> dict:
                                   check=True).stdout.strip()
         except (OSError, subprocess.CalledProcessError):
             return "?"
-    return {"commit": git("rev-parse", "--short", "HEAD"), "dirty": bool(git("status", "--porcelain")),
+    # dirty zählt nur Code und Konfiguration: Notebooks ändern sich bei jedem Lauf (Ausgaben),
+    # sie werden getrennt aufgeführt.
+    code = git("status", "--porcelain", "--", ".", ":(exclude)notebooks")
+    nbs = git("status", "--porcelain", "--", "notebooks")
+    return {"commit": git("rev-parse", "--short", "HEAD"),
+            "dirty": bool(code), "dirty_files": [l.split(maxsplit=1)[1] for l in code.splitlines()],
+            "notebooks_geändert": [l.split(maxsplit=1)[1] for l in nbs.splitlines()],
             "plan_tag": git("rev-parse", "--short", "auswertungsplan-v1^{}"),
             "zeit": time.strftime("%Y-%m-%d %H:%M")}
