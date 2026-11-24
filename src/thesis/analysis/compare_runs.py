@@ -8,6 +8,10 @@ beide Läufe Feature-Maps enthalten – die Eigen-CAM-Metriken, und falls beide 
 (ReLU überall 0, z. B. gesättigtes Logit) werden als ``gradcam_empty`` markiert und nicht gemittelt. Schreibt
 ``compare_<edge-run>.csv`` in den Referenz-Ordner und eine Kurzfassung auf stdout.
 Das ist der End-to-End-Check aus AP0.
+
+Eigen-CAM-Vorzeichen: standardmäßig nur die referenzfreie Orientierung (``first_pc_projection``);
+``eigencam_flipped`` zeigt, ob die Ausrichtung an der Referenz umgedreht hätte. Mit
+``--align-eigencam`` wird wie bis 24.11.2026 an der Referenz ausgerichtet (Sensitivitätsanalyse).
 """
 
 from __future__ import annotations
@@ -48,6 +52,8 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("ref_run", type=Path)
     ap.add_argument("q_run", type=Path)
+    ap.add_argument("--align-eigencam", action="store_true",
+                    help="Eigen-CAM-Vorzeichen an der Referenz ausrichten (nur Sensitivitätsanalyse)")
     args = ap.parse_args()
 
     ref_ids, ref_logits = _load(args.ref_run, "logits")
@@ -70,7 +76,10 @@ def main() -> None:
         }
         if have_feat:
             cam_ref = eigencam(ref_feat[1][k])
-            cam_q, flipped = align_to_reference(cam_ref, eigencam(q_feat[1][j]))
+            cam_q = eigencam(q_feat[1][j])
+            aligned, flipped = align_to_reference(cam_ref, cam_q)
+            if args.align_eigencam:
+                cam_q = aligned
             row.update({f"eigencam_{m}": v for m, v in compare(cam_ref, cam_q).as_row().items()})
             row["eigencam_flipped"] = int(flipped)
         if have_grad:

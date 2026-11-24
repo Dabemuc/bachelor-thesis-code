@@ -19,6 +19,10 @@ data/calib/
 # Rohdaten der Messläufe: Metadaten + CSV werden committet, Tensoren nicht (s. o.)
 results/**/*.png
 
+# Zwischendateien der Kern-Auswertung (Notebook 00_daten, aus results/ reproduzierbar)
+auswertung_cache/
+.ipynb_checkpoints/
+
 # OS / Editor
 .DS_Store
 .idea/

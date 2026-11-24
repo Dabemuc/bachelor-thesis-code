@@ -7,7 +7,11 @@ ausgewertet werden.
 * ``cc``        – Pearson-Korrelation (1 = gleicher Fokus)
 * ``kld``       – KL-Divergenz, Heatmaps als Verteilungen (0 = gleich)
 * ``topk_iou``  – IoU der salientesten Pixel (Überlappung der Fokusregion)
-* ``spearman``  – Rangkorrelation; ≈ 0 markiert kollabierte Heatmaps
+* ``spearman``  – Rangkorrelation
+
+``collapsed`` = konstante Karte (Kollaps-Definition wie Quant-XAI, entschieden 24.11.2026,
+Auswertungsplan Abschn. 5). Die frühere ODER-Definition aus dem Prototyp steht noch als
+``is_broken_legacy`` zur Verfügung, wird im Kern aber nicht verwendet.
 
 Konvention: erstes Argument = FP32-Referenz, zweites = quantisierte Karte.
 """
@@ -94,6 +98,10 @@ def topk_iou(ref: np.ndarray, q: np.ndarray, frac: float = TOPK_FRACTION) -> flo
 def align_to_reference(reference: np.ndarray, cam: np.ndarray) -> tuple[np.ndarray, bool]:
     """Vorzeichen der Eigen-CAM-Hauptkomponente an der Referenz ausrichten.
 
+    Im Kern nur noch für die Sensitivitätsanalyse (Auswertungsplan Abschn. 8, 24.11.2026):
+    Die Hauptauswertung nutzt die referenzfreie Orientierung aus ``first_pc_projection``,
+    weil die Ausrichtung an FP32 die Ähnlichkeit zu FP32 systematisch erhöht.
+
     Für eine auf [0, 1] normierte Karte ist die vorzeichen-gespiegelte Projektion
     genau ``1 - cam``. Rückgabe: (ausgerichtete Karte, wurde gespiegelt).
     """
@@ -106,7 +114,13 @@ def is_collapsed(heatmap: np.ndarray, std_threshold: float = 1e-4) -> bool:
     return bool(np.std(heatmap) < std_threshold)
 
 
-def is_broken(cc: float, iou: float, rho: float, q: np.ndarray) -> bool:
+def is_broken_legacy(cc: float, iou: float, rho: float, q: np.ndarray) -> bool:
+    """Prototyp-Definition „gebrochene Karte“ (ODER aus vier Kriterien).
+
+    Verworfen am 24.11.2026: Schwellen ohne Quelle, und die IoU-Schwelle nimmt den
+    Zufallsboden bei k = 0,15 an statt bei k/(2−k) ≈ 0,081. Nur noch zum Nachvollziehen
+    älterer Ergebnisse (Phase 1).
+    """
     return bool(
         is_collapsed(q)
         or rho < COLLAPSE_SPEARMAN
@@ -120,4 +134,4 @@ def compare(ref: np.ndarray, q: np.ndarray) -> HeatmapMetrics:
     iou = topk_iou(ref, q)
     rho = spearman(ref, q)
     return HeatmapMetrics(cc=cc, kld=kl_divergence(ref, q), topk_iou=iou, spearman=rho,
-                          collapsed=is_broken(cc, iou, rho, q))
+                          collapsed=is_collapsed(q))

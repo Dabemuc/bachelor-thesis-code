@@ -35,3 +35,10 @@ def test_eigencam_finds_hot_region():
     assert proj[:3, :3].mean() > proj[4:, 4:].mean()
     cam = eigencam(feats)
     assert cam.shape == (224, 224) and 0.0 <= cam.min() and cam.max() <= 1.0 + 1e-9
+
+
+def test_shifted_map_is_not_collapsed():
+    # Kollaps = konstante Karte (24.11.2026): eine stark verschobene, aber strukturierte Karte zählt nicht
+    rng = np.random.default_rng(4)
+    ref = rng.random((32, 32))
+    assert not compare(ref, rng.random((32, 32))).collapsed

@@ -28,6 +28,11 @@ compile = [
 ]
 analysis = [
     "matplotlib>=3.8",
+    "pandas>=2.2",
+    "pyarrow>=15",        # Parquet-Tabellen in auswertung_cache/tabellen/
+    "scipy>=1.12",        # Statistik in den Notebooks (Spearman, Vorzeichen …)
+    "jupyterlab>=4.1",
+    "ipykernel>=6.29",
 ]
 dev = [
     "pytest>=8.0",
