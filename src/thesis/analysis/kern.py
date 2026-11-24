@@ -578,7 +578,57 @@ def compute_tables(spec: KernSpec = KernSpec(), cache: Path = CACHE_DIR, n_jobs:
                 save_table(fn(), p)
                 log(f"geschrieben {p.name}")
             out[f"{name}_{model}"] = p
+    write_manifest(cache)
     return out
+
+
+MANIFEST = REPO_ROOT / "notebooks" / "tabellen_manifest.json"
+
+
+def _sha256(path: Path) -> str:
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _rows(path: Path) -> int:
+    try:
+        import pyarrow.parquet as pq
+        return pq.ParquetFile(path).metadata.num_rows
+    except ImportError:
+        return len(pd.read_parquet(path))
+
+
+def write_manifest(cache: Path = CACHE_DIR, manifest: Path = MANIFEST) -> dict:
+    """SHA-256, Zeilenzahl und Code-Stand je Tabelle in ``notebooks/tabellen_manifest.json`` (im Git).
+
+    Die Tabellen selbst sind zu groß fürs Git; über den Hash ist jede Notebook-Zahl an genau
+    eine Tabellenfassung gebunden. Nach ``compute_tables`` einmal aufrufen.
+    """
+    tabellen = {}
+    for p in sorted((Path(cache) / "tabellen").glob("*.parquet")):
+        tabellen[p.name] = {"sha256": _sha256(p), "zeilen": _rows(p), "bytes": p.stat().st_size,
+                            "geändert": time.strftime("%Y-%m-%d %H:%M", time.localtime(p.stat().st_mtime))}
+    out = {"erzeugt": time.strftime("%Y-%m-%d %H:%M"), "code": provenance(), "tabellen": tabellen}
+    Path(manifest).write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return out
+
+
+def check_manifest(cache: Path = CACHE_DIR, manifest: Path = MANIFEST) -> pd.DataFrame:
+    """Für die erste Zelle der Notebooks ab 01: Stimmen die Tabellen mit dem Manifest überein?"""
+    m = json.loads(Path(manifest).read_text(encoding="utf-8"))
+    rows = []
+    for name, info in m["tabellen"].items():
+        p = Path(cache) / "tabellen" / name
+        sha = _sha256(p) if p.exists() else None
+        rows.append({"tabelle": name, "sha256": info["sha256"][:12], "zeilen": info["zeilen"],
+                     "ok": sha == info["sha256"]})
+    df = pd.DataFrame(rows)
+    df.attrs["manifest_commit"] = m["code"]["commit"]
+    return df
 
 
 def provenance() -> dict:

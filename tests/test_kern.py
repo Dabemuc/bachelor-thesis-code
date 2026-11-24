@@ -137,3 +137,18 @@ def test_pipeline_on_toy_data(toy):
     k1 = a[a.source == "emu_k01"]
     assert len(k1) == 4 and np.allclose(k1.frac_equal, 1.0) and np.allclose(k1.rel_err, 0.0)
     assert len(a[a.source == "emuvoll_k01"]) == 12
+
+
+def test_manifest(tmp_path):
+    (tmp_path / "tabellen").mkdir()
+    p = tmp_path / "tabellen" / "x.parquet"
+    p.write_bytes(b"abc")                      # Inhalt egal: Hash und Vergleich werden geprüft
+    rows, kern._rows = kern._rows, (lambda path: 3)   # ohne pyarrow lesbar
+    try:
+        m = kern.write_manifest(tmp_path, tmp_path / "manifest.json")
+    finally:
+        kern._rows = rows
+    assert m["tabellen"]["x.parquet"]["sha256"] == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    assert kern.check_manifest(tmp_path, tmp_path / "manifest.json").ok.all()
+    p.write_bytes(b"abd")
+    assert not kern.check_manifest(tmp_path, tmp_path / "manifest.json").ok.any()
