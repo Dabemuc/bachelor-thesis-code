@@ -1,6 +1,6 @@
-<!-- Eingefrorene Kopie der Vault-Notiz '1 Forschung/Auswertungsplan.md' (Obsidian), Stand updated: 2026-11-24 (nachmittags, alle Punkte entschieden).
-     Kopiert am 2026-11-24 vor Sichtung der Kern-Daten. SHA-256 der Vault-Datei: 05805174d63c632cc49da564213f6665be524d3fda6fcff10c24b8eb02099379
-     Vorherige Fassung: Commit ba84acd (Stand updated: 2026-11-16, mit veralteten Status-Markierungen).
+<!-- Eingefrorene Kopie der Vault-Notiz '1 Forschung/Auswertungsplan.md' (Obsidian), Stand 2026-11-24 (abends: alle Punkte entschieden, Abschn. 10–11 ergänzt).
+     Kopiert am 2026-11-24 vor Sichtung der Kern-Daten. SHA-256 der Vault-Datei: b4fc26f1f7261aca0c9c695cb41d752fa359f0b3f3c63ac20ac3da829d9f1009
+     Vorherige Fassungen: ba84acd (Stand 16.11., veraltete Markierungen), 5a2cd89 (ohne Abschn. 10–11).
      Nicht bearbeiten. Änderungen am Plan nach diesem Datum offen als Abweichung berichten. -->
 
 ---
@@ -14,6 +14,8 @@ updated: 2026-11-24
 
 > 🔒 **Eingefroren 24.11.2026** (vor Sichtung der Kern-Daten): Kopie im Code-Repo `docs/auswertungsplan_kern_2026-11-24.md`, Commit `ba84acd`, Tag `auswertungsplan-v1` → [[2026-11-24]]. Spätere Änderungen an Hauptmaß, Aggregation, Tests oder Ausschlussregeln nur mit datiertem Vermerk und als Abweichung in der Arbeit berichten (Abschn. 9).
 
+> ✅ **Nachtrag 24.11.2026 (später):** Abschnitte 10 (Literatur, Kernaussagen, keine Fake-Quant) und 11 (Berichtsebenen, Abstufungsreihenfolge) ergänzt und entschieden → erneut eingefroren, Tag `auswertungsplan-v1` neu gesetzt (Commit im Logbuch).
+>
 > ✅ **Stand 24.11.2026 (nachmittags): Plan vollständig entschieden** (Abschn. 5–8 und 2.2 mit Daniel durchgegangen → [[2026-11-24]]) und **neu eingefroren**: Repo-Kopie aktualisiert, Tag `auswertungsplan-v1` neu gesetzt (Commit im Logbuch). Der Kasten darunter bleibt als Verlauf stehen. Offene Code-Anpassungen vor der Auswertung: `is_broken` (Abschn. 5), Eigen-CAM ohne FP32-Ausrichtung (Abschn. 8).
 >
 > **Stand 24.11.2026 (Durchsicht Claude):** Entschieden sind k, Umfang, Repräsentativitäts-Check, Hauptmaß, Grad-CAM-Variante, Zielklasse, Sättigung, Konsens/e gegen s, Emulator-Abstand, Kalibrierung (64) und Kompilierstufe (Default). ⚠️ **Noch Vorschlag, nie formal entschieden:** ~~Abschnitt 6 (Tests)~~ ✅ Abschnitt 6 vollständig entschieden 24.11. nachmittags, ~~die Schwellen von `is_broken` (Abschnitt 5)~~ ✅ Kollaps-Definition entschieden 24.11., ✅ Abschnitt 7 entschieden 24.11., ~~die Sonderfälle 2–4 in Abschnitt 8~~ ✅ entschieden 24.11., die Korrelation und der Gruppenvergleich in Abschnitt 7, die Schwellen von `is_broken` (Abschnitt 5), die Sonderfälle 2–4 in Abschnitt 8 und die Abnahme der Begründung 2.2. ⚠️ Korrigiert den Hinweis vom 24.11. in [[2026-11-24]], „inhaltlich alles entschieden“ → vor der Auswertung entscheiden und den Plan neu einfrieren.
@@ -258,6 +260,37 @@ Zwei Böden zur Einordnung: **Zufallsboden** ≈ 0,081 (unabhängige Top-15 %-Ma
 
 - Zusätzliche, **als explorativ gekennzeichnete** Auswertungen (z. B. andere k-Fraktion, Schwerpunkt-Distanz, Deletion/Insertion).
 - Nicht erlaubt: Hauptmaß, Aggregation, Zielklasse oder Ausschlussregeln nachträglich ändern, ohne das offen zu berichten.
+
+## 10. Einordnung gegen die Literatur (Kernaussagen)
+
+✅ **Entschieden 24.11.2026 (Daniel):** Die Arbeit enthält einen Abschnitt „Einordnung gegen die Literatur“. Verglichen werden die **Kernaussagen** der Referenzarbeiten, nicht jede Einzelzahl. **Keine eigene Fake-Quant-Simulation im Kern**, der DFC-Emulator ersetzt die Simulation (wie 20.10. entschieden, Abweichung vom Exposé begründet in 1.1). Verworfen: Fake-Quant-Simulation im Paper-Stil als dritte Stufe (sprengt den Kern).
+
+Zuordnung (Vorschlag Claude, 24.11.2026; Arbeitsgrundlage für den Abschnitt, Formulierung erst beim Schreiben; Vorbehalte gelten):
+
+| Arbeit | Kernaussage | Eigenes Gegenstück | Vorbehalte |
+|---|---|---|---|
+| [[Quantization Effects on Neural Networks Perception]] | INT8 verändert CAMs messbar, Stärke architekturabhängig | FF-1 (e, e − s) und Modellvergleich | Grad-CAM++, andere Modelle, Software-Quantisierung mit adaptivem Bereich; INT16 nicht untersucht |
+| [[Quant-XAI 2026 (Preprint)]] | starker Drift unter INT8 (Top-15 %-IoU 0,126); **Grad-CAM-Kollaps bei MobileNetV3-Large** trotz 90 % gleicher Vorhersagen | FF-1 MobileNetV3 Grad-CAM; Anteil **Kollaps + Sättigungsausfall** (für diesen Vergleich als Summe berichten) | 20 Bilder, Pflanzenkrankheiten, Fake-Quant; ⚠️ eigene Vermutung (ungeprüft): deren Kollaps könnte derselbe Clipping-Mechanismus sein wie die eigene Logit-Sättigung |
+| [[Quant-XAI 2026 (Preprint)]] | gradientenbasierte Verfahren driften stärker als gradientenfreie | Grad-CAM gegen Eigen-CAM (beide im Kern) | dort LIME/IG, hier Eigen-CAM (gradientenfrei, aber nicht perturbationsbasiert) |
+| [[Same Predictions Different Reasons 2026 (Preprint)]] | Accuracy ist kein verlässlicher Indikator für Erklärungsstabilität | TF3 (Zusammenhang Ausgabe ↔ Fokus), strenge Teilmenge gleicher Vorhersagen | nur Gewichte quantisiert, binäre Aufgaben |
+| [[E0 Simulation (Prototyp)]] | INT8 in Simulation robust, Kollaps erst bei INT4 | FF-1 (hardware-real) | Prototyp, wenige Bilder; INT4 erst Phase 3 |
+| alle | Effekt nur in Simulation gezeigt | Kernbeitrag: hardware-real + **Compile-Zufall** als Größe, die eine deterministische Simulation nicht kennt; TF2/FF-2 (Emulator ↔ Chip) | – |
+
+## 11. Berichtsebenen und Priorität
+
+✅ **Entschieden 24.11.2026 (Daniel):** Ergebnisse auf drei Ebenen: **Ergebnisteil** (je Modell × Verfahren eine Abbildung IoU(FP32, INT8) neben IoU(INT8, INT8), Median(e − s) mit KI, Konsens, Modellvergleich) · **Robustheit** (eine Tabelle) · **Anhang**. **Alle geplanten Nebenanalysen bleiben im Plan**, weil sie Mehrwert bieten und zum Teil Kernaussagen stützen. Erst wenn die Zeit knapp wird, können die unwichtigsten zu optionalen Extras abgestuft werden; dann wird je Analyse entschieden, ob sie noch verfolgt oder verworfen wird.
+
+~~Zuordnung mit Ebene „Extra (optional)“ für Hybrid-Grad-CAM, Schnittmenge, KLD, Spearman (Vorschlag Claude, 24.11.)~~ ⚠️ verworfen 24.11.2026: Missverständnis, Daniel wollte keine Abstufung vorab.
+
+**Reihenfolge für eine mögliche Abstufung** (Vorschlag Claude, ✅ bestätigt 24.11.2026 von Daniel), zuerst abzustufen oben:
+1. KLD (nur Anhang; Vergleich mit Kerkouri ohnehin nur qualitativ)
+2. Spearman als eigenes Maß über den Kollaps-Indikator hinaus
+3. Hybrid-Grad-CAM (Nebenvariante; stützt aber die Begründung der Abweichung vom Exposé, das Hybrid als Hauptweg vorsah)
+4. Schnittmenge ohne Sättigung (stützt die Sättigungs-Entscheidung, daher spät)
+
+**Nie abstufen:** alles, was eine Kernaussage trägt oder eine eigene Entscheidung absichert (Ergebnisteil; Sättigung als IoU = 0; strenge Teilmenge; Eigen-CAM mit FP32-Ausrichtung; Top-20 %-IoU und CC; KI nur über Bilder; Spannweite je Compile; Repräsentativitäts-Check).
+
+**Regel für eine Abstufung:** Sie wird **nach Zeit, nicht nach Ergebnis** entschieden, datiert im Logbuch festgehalten und in der Arbeit als „nicht durchgeführt“ genannt. Eine schon gerechnete Analyse wird berichtet (ggf. Anhang).
 
 ## Offene Entscheidungen (Daniel)
 
