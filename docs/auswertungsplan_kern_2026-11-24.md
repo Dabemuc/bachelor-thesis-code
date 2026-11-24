@@ -1,15 +1,22 @@
-<!-- Eingefrorene Kopie der Vault-Notiz '1 Forschung/Auswertungsplan.md' (Obsidian), Stand updated: 2026-11-16.
-     Kopiert am 2026-11-24 vor Sichtung der Kern-Daten. SHA-256 der Vault-Datei: 448b680eb51665bbf88a0dc6fae84c7b4546c8e3378dfe14728f9f415916057c
+<!-- Eingefrorene Kopie der Vault-Notiz '1 Forschung/Auswertungsplan.md' (Obsidian), Stand updated: 2026-11-24 (nachmittags, alle Punkte entschieden).
+     Kopiert am 2026-11-24 vor Sichtung der Kern-Daten. SHA-256 der Vault-Datei: 05805174d63c632cc49da564213f6665be524d3fda6fcff10c24b8eb02099379
+     Vorherige Fassung: Commit ba84acd (Stand updated: 2026-11-16, mit veralteten Status-Markierungen).
      Nicht bearbeiten. Änderungen am Plan nach diesem Datum offen als Abweichung berichten. -->
 
 ---
 tags: [bachelorarbeit, methodik, auswertungsplan]
 status: aktiv
 date: 2026-11-03
-updated: 2026-11-16
+updated: 2026-11-24
 ---
 
 # Auswertungsplan (Kern, Phase 2)
+
+> 🔒 **Eingefroren 24.11.2026** (vor Sichtung der Kern-Daten): Kopie im Code-Repo `docs/auswertungsplan_kern_2026-11-24.md`, Commit `ba84acd`, Tag `auswertungsplan-v1` → [[2026-11-24]]. Spätere Änderungen an Hauptmaß, Aggregation, Tests oder Ausschlussregeln nur mit datiertem Vermerk und als Abweichung in der Arbeit berichten (Abschn. 9).
+
+> ✅ **Stand 24.11.2026 (nachmittags): Plan vollständig entschieden** (Abschn. 5–8 und 2.2 mit Daniel durchgegangen → [[2026-11-24]]) und **neu eingefroren**: Repo-Kopie aktualisiert, Tag `auswertungsplan-v1` neu gesetzt (Commit im Logbuch). Der Kasten darunter bleibt als Verlauf stehen. Offene Code-Anpassungen vor der Auswertung: `is_broken` (Abschn. 5), Eigen-CAM ohne FP32-Ausrichtung (Abschn. 8).
+>
+> **Stand 24.11.2026 (Durchsicht Claude):** Entschieden sind k, Umfang, Repräsentativitäts-Check, Hauptmaß, Grad-CAM-Variante, Zielklasse, Sättigung, Konsens/e gegen s, Emulator-Abstand, Kalibrierung (64) und Kompilierstufe (Default). ⚠️ **Noch Vorschlag, nie formal entschieden:** ~~Abschnitt 6 (Tests)~~ ✅ Abschnitt 6 vollständig entschieden 24.11. nachmittags, ~~die Schwellen von `is_broken` (Abschnitt 5)~~ ✅ Kollaps-Definition entschieden 24.11., ✅ Abschnitt 7 entschieden 24.11., ~~die Sonderfälle 2–4 in Abschnitt 8~~ ✅ entschieden 24.11., die Korrelation und der Gruppenvergleich in Abschnitt 7, die Schwellen von `is_broken` (Abschnitt 5), die Sonderfälle 2–4 in Abschnitt 8 und die Abnahme der Begründung 2.2. ⚠️ Korrigiert den Hinweis vom 24.11. in [[2026-11-24]], „inhaltlich alles entschieden“ → vor der Auswertung entscheiden und den Plan neu einfrieren.
 
 Zugehörig: [[🏠 Bachelorarbeit - Home]] · [[Versuchsaufbau#Vorgehen (entschieden 19.10.2026)]] · [[Methodik]] · [[Phase 0 – Defaults]] · Grundlage: [[E2 Phase 1 Voraussetzungen]] · Logbuch: [[2026-11-03]]
 
@@ -67,7 +74,7 @@ Zugehörig: [[🏠 Bachelorarbeit - Home]] · [[Versuchsaufbau#Vorgehen (entschi
 | Bilder | Eval-Liste (disjunkt zur Kalibrierung) | ✅ Accuracy 48 000, CAM 5 000 geschichtet (Daniel, 03.11.2026, Bedingung: Begründung → 2.2) |
 | Zielklasse Grad-CAM | FP32-Top-1 | ✅ **entschieden 09.11.2026 (Daniel)**: FP32-Top-1 für alle Bilder (Hauptanalyse) + strenge Teilmenge gleicher Vorhersagen als Ergänzung (→ Abschnitt 7). Verworfen: eigene Top-1 je Modell (vermischt Klassenwechsel und Erklärungsänderung) · Ground Truth (andere Frage; FP32 bei ~30 % falsch) · nur Teilmenge (Selektionseffekt) · Teilmenge je Compile (passt nicht zur Aggregation je Bild über Compiles) |
 | Kalibriergröße | **64 (DFC-Default)** | ✅ entschieden 09.11.2026 (Daniel) nach Test → [[E2 Phase 1 Voraussetzungen#Kalibrier-Test 64 vs. 1024 (09.11.2026, Auswertung Claude)]]. Folge: Sättigung bleibt → Umgang hier festlegen |
-| ~~Kalibriergröße,~~ Kompilierstufe | → [[Phase 0 – Defaults#Zusammenführung (am Ende von Phase 0)]] | ❓ offen (im HEF eingebacken → **vor** den Kern-Compiles entscheiden) |
+| ~~Kalibriergröße,~~ Kompilierstufe | → [[Phase 0 – Defaults#Zusammenführung (am Ende von Phase 0)]] | ~~❓ offen (im HEF eingebacken → **vor** den Kern-Compiles entscheiden)~~ ✅ **entschieden 16.11.2026 (Daniel): Default** (P1: `max` bitgleich, nur +8 % FPS bei ≈ 2,5 h Compile) → [[E2 Phase 1 Voraussetzungen#P1 Kompilierstufe (16.11.2026, Auswertung Claude)]] · [[2026-11-16]] |
 
 ### 2.1 Umfang (n)
 
@@ -98,6 +105,12 @@ Daniel will die Teilmenge nur, wenn sie sich in der Arbeit gut begründen lässt
    - **Kriterium (vorab):** Teilmenge repräsentativ, wenn Median, P5 und Anteil gebrochener Karten auf 48 000 je Modell und Verfahren im 95 %-Bootstrap-KI der Teilmenge liegen; sonst als Einschränkung berichten.
    - Rechenzeit Emulator (gemessen 16.11.): Batch 2 ≈ 26 h MobileNetV3 + 2 h ResNet18; **Batch 4 ≈ 13 h + 2 h**. Verworfen: Grad-CAM auf 48 000 für alle Compiles (≈ 6 Tage) · nur 5 000 ohne Check · 10 000 für alle (kein direkter Repräsentativitätsnachweis).
    - Ursprünglicher Vorschlag: **Repräsentativitäts-Check (Vorschlag, billig):** Eigen-CAM braucht keine Gradienten. Für **einen** Compile je Modell FP32 ↔ Chip auf allen 48 000 rechnen und die Verteilung (Median, P5, Anteil gebrochener Karten) mit der 5 000er-Teilmenge vergleichen. Liegen die Kennzahlen innerhalb der Bootstrap-KI, ist die Teilmenge nachweislich repräsentativ. Kosten: Chip ≈ 8 min, FP32-Features ≈ 7 GB (MobileNetV3) + 2,8 GB (ResNet18) auf dem Mac.
+
+✅ **Abgenommen 24.11.2026 (Daniel), mit folgenden Nachträgen** (Durchsicht Claude, nach den Entscheidungen vom 24.11.):
+- **Geltungsbereich:** Die 5 000er-Teilmenge betrifft nur noch **Grad-CAM** (Emulator). Eigen-CAM läuft seit 16.11. auf allen 48 000 Bildern (Punkt 5).
+- **Zu Punkt 1:** Die genannten KI-Breiten sind ein Bootstrap **nur über Bilder** mit 95 %. Das Hauptintervall ist seit 24.11. **zweistufig** (Bilder + Compiles) und auf **99,2 %** (Bonferroni, Abschn. 6) → breiter; die Zahlen gelten nur noch als untere Grenze. Das stärkt die Begründung: Kommt ein großer Teil der Unsicherheit aus den 10 Compiles, macht mehr n das KI kaum schmaler; der Engpass sind die Compiles, nicht die Bilder. ⚠️ Korrektur im Wortlaut: bei MobileNetV3 ist das KI **knapp** (≈ 0,43), nicht „gut“ halb so breit wie der Effekt.
+- **Zu Punkt 4:** Die Kern-Läufe liefen mit **Batch 4** (2.1, 16.11.), nicht Batch 2. Das Kostenargument bleibt: Grad-CAM auf 48 000 × 10 ≈ 6 Tage gegen ≈ 13 h + 2 h.
+- **Empirischer Beleg:** Der Repräsentativitäts-Check (Punkt 5) prüft die Teilmenge direkt gegen 48 000 Bilder und läuft als **erster Schritt** der Auswertung; sein Ergebnis wird unabhängig vom Ausgang berichtet.
 
 Ehrliche Grenze: Für die **Ränder** der Verteilung (P5, Minimum, seltene Kollapsfälle) ist mehr n immer besser. Wer diese Ränder als Hauptaussage braucht, müsste auf 10 000 gehen (Kerkouri-Größe, ≈ doppelte Emulator-Zeit).
 
@@ -160,12 +173,12 @@ Mit FP32 = PyTorch-Referenz, Cᵢ = Compile i (i = 1…k), Chipᵢ = Pi-Lauf von
 | Vergleich | Eigen-CAM | Grad-CAM | dient |
 |---|---|---|---|
 | **Effekt:** FP32 ↔ Chipᵢ | ✅ (hardware-real) | – | TF1 |
-| **Effekt:** FP32 ↔ Emuᵢ | ✅ | ✅ (Hauptvariante, Vorschlag) | TF1 (Grad-CAM) |
+| **Effekt:** FP32 ↔ Emuᵢ | ✅ | ✅ (Hauptvariante, ~~Vorschlag~~ ✅ entschieden 03.11.2026) | TF1 (Grad-CAM) |
 | **Compile-Streuung:** Chipᵢ ↔ Chipⱼ, Emuᵢ ↔ Emuⱼ (i < j) | ✅ | ✅ | Referenz für TF1 |
 | **Emulator-Lücke:** Emuᵢ ↔ Chipᵢ | ✅ | – | TF2 |
 | Hybrid-Grad-CAM (A vom Chipᵢ, Gradienten aus Emuᵢ) vs. FP32 | – | ✅ (Nebenvariante) | TF2-Diskussion |
 
-**Grad-CAM-Hauptvariante: reiner Emulator** (✅ entschieden 03.11.2026, Daniel). Begründung: in sich konsistent (A und Gradienten aus demselben Modell), Gradientenpfad gegen PyTorch bestätigt ([[E2 Phase 1 Voraussetzungen#Grad-CAM: PyTorch gegen Emulator (03.11.2026, Auswertung Claude)]]). Die Hybrid-Variante mischt Chip-Aktivierungen mit Gradienten eines anderen (Emulator-)Modells; sie wird als Nebenvariante berichtet, weil sie näher am „Gerät“ ist. ❓ offen
+**Grad-CAM-Hauptvariante: reiner Emulator** (✅ entschieden 03.11.2026, Daniel). Begründung: in sich konsistent (A und Gradienten aus demselben Modell), Gradientenpfad gegen PyTorch bestätigt ([[E2 Phase 1 Voraussetzungen#Grad-CAM: PyTorch gegen Emulator (03.11.2026, Auswertung Claude)]]). Die Hybrid-Variante mischt Chip-Aktivierungen mit Gradienten eines anderen (Emulator-)Modells; sie wird als Nebenvariante berichtet, weil sie näher am „Gerät“ ist. ~~❓ offen~~ ✅ **Stand 24.11.2026:** Hybrid als Nebenvariante ebenfalls am 03.11. entschieden (s. Offene Entscheidungen).
 
 ## 5. Aggregation und Umgang mit dem Compile-Zufall
 
@@ -174,6 +187,8 @@ Je Bild zuerst über die Compiles mitteln, dann über Bilder:
 - **Streuung je Bild:** s = Mittel über i < j von IoU(Xᵢ, Xⱼ)
 - Berichtet je Modell und CAM-Verfahren: **Median, P5 und Minimum** von e (Median *und* schlechteste Bilder, wie 19.10. festgelegt), dieselben Kennzahlen für s, dazu die Spannweite der Mediane über die k Compiles (zeigt, wie stark ein einzelner Compile das Ergebnis verschiebt).
 - **Anteil „gebrochener“ Karten** (`is_broken`: Kollaps, Spearman < 0,2, CC ≤ 0, IoU ≤ 1,05 · 0,15) je Variante.
+  - ~~⚠️ **Stand 24.11.2026:** Schwellen von `is_broken` sind Vorschlag (Code-Default), nicht formal entschieden.~~
+  - ✅ **Entschieden 24.11.2026 (Daniel):** **Kollaps = konstante Karte** (Standardabweichung < 10⁻⁴; Definition wie [[Quant-XAI 2026 (Preprint)]]: konstante Heatmaps, ρ = 0). Leere Grad-CAM durch Logit-Sättigung zählt **nicht** als Kollaps, sondern als Ausfall (eigene Ausfallrate, Abschn. 8). Zusätzlich beschreibend: **Anteil mit Top-15 %-IoU ≤ Zufallsboden 0,081**. Verworfen: `is_broken` wie im Code (ODER aus konstant, Spearman < 0,2, CC ≤ 0, IoU ≤ 0,1575; Schwellen ohne Quelle, IoU-Schwelle mit falschem Zufallsboden 0,15) · Code-Variante mit IoU-Schwelle 0,081. ⚠️ Code anpassen (`is_broken` in `src/thesis/analysis/metrics.py`), bevor die Kern-Auswertung läuft → [[2026-11-24]]
 
 **Interpretation von s (wichtig, aus [[2026-11-03]]):** s ist kein reiner „Zufallsboden“ für e. In s steckt nur der compile-abhängige Anteil (zweimal), in e der systematische plus der compile-abhängige Anteil (einmal). Ist e ≈ s, ist die Abweichung überwiegend compile-abhängig; ist e deutlich unter s, gibt es einen systematischen Anteil. Ergänzend (Vorschlag): **Konsens-Vergleich** – CAM aus den über die k Compiles gemittelten Feature-Maps (bzw. Gradienten) gegen FP32; mittelt den compile-abhängigen Anteil heraus und schätzt den systematischen. ⚠️ eigene Überlegung, nicht aus der Literatur → in der Arbeit als solche kennzeichnen.
 
@@ -187,12 +202,26 @@ Zwei Böden zur Einordnung: **Zufallsboden** ≈ 0,081 (unabhängige Top-15 %-Ma
 
 ## 6. Tests
 
+> ⚠️ **Stand 24.11.2026:** Ganzer Abschnitt ist Vorschlag Claude (03.11.), **nicht formal entschieden**. Offen dabei auch: Modellvergleich ungepaart oder gepaart über dieselben Bilder.
+>
+> ✅ **Entschieden 24.11.2026 (Daniel) – Unsicherheit (KI):** Für die Hauptaussagen (FF-1 e − s und Konsens, Modellvergleich, TF2, FF-2, TF3) **zweistufiges Bootstrap-KI**: je Ziehung Bilder **und** die 10 Compiles mit Zurücklegen ziehen; Paare eines Compiles mit sich selbst (IoU = 1) gehen nicht in s ein. Zusätzlich berichtet: Spannweite der Mediane über die 10 Compiles und das KI nur über Bilder (Robustheit; die Differenz zeigt den Anteil des Compile-Zufalls). **Repräsentativitäts-Check (2.2) nur über Bilder.** Begründung: Aussage gilt für den DFC-Default, nicht für 10 bestimmte HEFs; Compile-Streuung bei MobileNetV3 so groß wie der Effekt (Phase 1). Verworfen: nur Bilder + Spannweite. ⚠️ Einschränkung: Bootstrap über nur 10 Compiles unterschätzt die Unsicherheit eher. Ziehungen: 10 000; beim Konsens ggf. weniger (Rechenaufwand, beim Programmieren prüfen) → [[2026-11-24]]
+>
+> ✅ **Entschieden 24.11.2026 (Daniel) – Test:** kein klassischer Test (Wilcoxon/Vorzeichentest halten die Compiles fest und passen nicht zum zweistufigen KI). Ein systematischer Anteil gilt als belegt, wenn das zweistufige KI von Median(e − s) vollständig unter 0 liegt (ggf. Bootstrap-p). Anteil der Bilder mit e < s nur beschreibend. Damit ist der Wilcoxon-Punkt unten ~~überholt~~.
+>
+> ✅ **Entschieden 24.11.2026 (Daniel) – Modellvergleich gepaart:** je Ziehung dieselbe Bildauswahl für beide Modelle, Compiles je Modell getrennt gezogen.
+>
+> ✅ **Entschieden 24.11.2026 (Daniel): Bonferroni über 6 Hauptaussagen** wie im Vorschlag. ~~❓ **Noch offen:** Bonferroni-Umfang.~~ Vorschlag Claude: 6 Hauptaussagen (e − s für 2 Modelle × 2 Verfahren + Modellvergleich je Verfahren) → KIs auf 1 − 0,05/6 ≈ 99,2 %; TF2, FF-2, TF3 beschreibend mit 95 %-KI. Alternativen: nur die 4 Aussagen e − s (98,75 %) · keine Korrektur.
+
 - **Effekt über der Compile-Streuung?** Gepaarter Wilcoxon-Vorzeichen-Rang-Test je Bild auf e − s (H₀: Median 0), je Modell und Verfahren; Effektstärke = Median(e − s) mit Bootstrap-95 %-KI (10 000 Ziehungen über Bilder). Bei n = 5 000 wird fast jeder Unterschied signifikant → **Effektstärke und KI sind die eigentliche Aussage**, der p-Wert nur Formalie.
 - **ResNet18 vs. MobileNetV3:** Differenz der Mediane von e mit Bootstrap-KI (ungepaart über Modelle, gepaart über dieselben Bilder möglich, da gleiche Liste).
 - **TF2:** Median/P5 von IoU(Emuᵢ, Chipᵢ) mit KI, relativ zu s.
 - Mehrfachtests: wenige, vorab benannte Tests (je Modell × Verfahren) → Bonferroni über diese, Rest beschreibend.
 
 ## 7. TF3: Zusammenhang Fokus ↔ Ausgabe
+
+> ~~⚠️ **Stand 24.11.2026:** Spearman-Korrelation und Gruppenvergleich sind Vorschlag, **nicht formal entschieden**. Entschieden ist nur die strenge Teilmenge (09.11.).~~
+>
+> ✅ **Entschieden 24.11.2026 (Daniel):** Hauptmaß der Ausgabeabweichung **1 − Logit-Cosinus**, Zweitmaß **ΔP der FP32-Klasse** (je Bild über Compiles gemittelt), Spearman mit 1 − e. Ausgabe aus **derselben Quelle wie die CAM** (Chip-Logits für Eigen-CAM, Emulator-Logits für Grad-CAM). Gruppenvergleich mit/ohne Top-1-Wechsel (in ≥ 1 Compile): Median von e je Gruppe + Differenz mit zweistufigem 95 %-KI, **beschreibend**. Verworfen: KL-Divergenz der Softmax · ΔP als Hauptmaß. ⚠️ Einschränkung: Bei gesättigten Bildern verändert das abgeschnittene Ziel-Logit auch Logit-Cosinus und ΔP (realer Chip-Effekt); bei Grad-CAM fallen diese Bilder heraus, bei Eigen-CAM bleiben sie drin → [[2026-11-24]]
 
 - Je Bild und Modell: Spearman-Korrelation zwischen Ausgabeabweichung (1 − Logit-Cosinus, gemittelt über Compiles) und CAM-Abweichung (1 − e), mit Bootstrap-KI.
 - Gruppenvergleich: Bilder **mit** Top-1-Wechsel (in mindestens einem Compile) vs. **ohne** → Verteilung von e je Gruppe.
@@ -204,9 +233,11 @@ Zwei Böden zur Einordnung: **Zufallsboden** ≈ 0,081 (unabhängige Top-15 %-Ma
 | Fall | Umgang (Vorschlag) |
 |---|---|
 | **Logit-Sättigung** (Ziel-Logit am Ende des Ausgabebereichs, Phase 1: ~2 % der Bilder; STE-Gradient 0 → Grad-CAM leer) | ✅ **entschieden 09.11.2026 (Daniel):** (1) Ausschluss **nur aus den Grad-CAM-Metriken**, je Compile; Accuracy, Top-1 und Eigen-CAM behalten alle Bilder. (2) **Ausfallrate** (Anteil leerer Karten je Modell und Compile) als eigenes Ergebnis berichten (FP32 hat keine Ausfälle → Quantisierungseffekt). (3) **Sensitivitätsanalyse** mit leerer Karte = IoU 0. (4) Robustheitscheck auf der **Schnittmenge** (Bilder in keinem der k Compiles gesättigt). Selektionseffekt (höchste FP32-Logits) als Einschränkung nennen. Verworfen: leere Karte als IoU 0 im Hauptmaß (vermischt Ausfall mit Fokusverschiebung) · Bild aus der ganzen Analyse nehmen (entfernt ohne Grund die sichersten Bilder) · Kalibrierung 1024 (s. Kalibrier-Test). ~~Bild markieren, Anteil je Modell und Compile berichten. Grad-CAM-Metriken ohne leere Karten, **zusätzlich** Sensitivitätsanalyse (leere Karte als IoU = 0 gewertet). Eigen-CAM betrifft es nicht. Ursache (Ausgabebereich aus 64 Kalibrierbildern?) in P8 prüfen~~ |
-| Eigen-CAM-Vorzeichen | an FP32 ausrichten (wie bisher), Flips zählen und berichten |
-| Bild in einem Compile anders vorhergesagt | bleibt drin (Zielklasse ist FP32-Top-1), geht in TF3-Gruppen ein |
-| Lauf mit `dirty: true` oder abweichendem HEF-Hash zwischen Emulator und Chip | nicht verwenden |
+| Eigen-CAM-Vorzeichen | ~~an FP32 ausrichten (wie bisher), Flips zählen und berichten~~ ✅ **24.11.2026 (Daniel):** Hauptauswertung nur mit energiebasierter Orientierung ohne Referenz (`first_pc_projection`), **keine** Ausrichtung an FP32 (schönt sonst e und s); Flips gegenüber FP32 zählen und berichten; Sensitivitätsanalyse mit FP32-Ausrichtung. ⚠️ Code anpassen: `compare_runs.py` richtet bisher an FP32 aus |
+| Bild in einem Compile anders vorhergesagt | bleibt drin (Zielklasse ist FP32-Top-1), geht in TF3-Gruppen ein · ✅ bestätigt 24.11.2026 (Daniel) |
+| Lauf mit `dirty: true` oder abweichendem HEF-Hash zwischen Emulator und Chip | nicht verwenden · ✅ bestätigt 24.11.2026 (Daniel) |
+
+> ✅ **Stand 24.11.2026 (nachmittags):** alle Zeilen entschieden. ~~⚠️ **Stand 24.11.2026:** Entschieden ist nur die Zeile Logit-Sättigung (09.11.).~~ Die Zeilen Eigen-CAM-Vorzeichen, anders vorhergesagtes Bild und `dirty`/HEF-Hash sind Vorschlag (die `dirty`-Regel wird in der Praxis schon angewandt, s. [[2026-11-18]]).
 
 ### Logit-Sättigung: Mechanismus und Literatur (Recherche Claude, 09.11.2026)
 
@@ -231,14 +262,21 @@ Zwei Böden zur Einordnung: **Zufallsboden** ≈ 0,081 (unabhängige Top-15 %-Ma
 ## Offene Entscheidungen (Daniel)
 
 - [x] k ✅ 10 (Daniel, 03.11.2026)
-- [x] Umfang n ✅ Accuracy 48 000, CAM 5 000 geschichtet (Daniel, 03.11.2026; Begründung 2.2 von Daniel noch abzunehmen)
+- [x] Umfang n ✅ Accuracy 48 000, CAM 5 000 geschichtet (Daniel, 03.11.2026; ~~Begründung 2.2 von Daniel noch abzunehmen~~ ✅ abgenommen 24.11.2026 mit Nachträgen)
 - [x] Repräsentativitäts-Check ✅ Eigen-CAM Chip 48 000 × 10, Grad-CAM 5 000 × 10 + 48 000 × 1 je Modell (Daniel, 16.11.2026) → 2.2 Punkt 5
 - [x] Hauptmaß ✅ Top-15 %-IoU, Robustheit Top-20 %, Zweitmaß CC, Kollaps Spearman, KLD Anhang (Daniel, 09.11.2026) → 3.1
 - [x] Grad-CAM-Hauptvariante ✅ reiner Emulator, Hybrid als Nebenvariante (Daniel, 03.11.2026)
 - [x] Zielklasse ✅ FP32-Top-1 + strenge Teilmenge (Daniel, 09.11.2026)
 - [x] Umgang mit der Logit-Sättigung ✅ entschieden 09.11.2026 (Daniel), s. Tabelle Sonderfälle
 - [x] Konsens-Vergleich ✅ als Ergänzung (Karten mitteln), Hauptlogik e gegen s (Daniel, 09.11.2026)
-- [ ] TF-Wortlaut gegen das Exposé prüfen
+- [x] TF-Wortlaut gegen das Exposé prüfen ✅ 10.11.2026 abgeglichen, Lücken entschieden → 1.1 (abgehakt 24.11.)
+- [x] ✅ **24.11.2026:** Bootstrap-KI zweistufig für die Hauptaussagen, Repräsentativitäts-Check nur über Bilder → Abschn. 6
+- [x] ✅ **24.11.2026:** kein klassischer Test (Entscheidung über zweistufiges KI), Modellvergleich gepaart → Abschn. 6
+- [x] ✅ **24.11.2026:** Bonferroni über 6 Hauptaussagen (99,2 %-KI) → Abschn. 6
+- [x] ✅ **24.11.2026:** Kollaps = konstante Karte, ohne Sättigungs-Ausfälle; Anteil IoU ≤ 0,081 beschreibend → Abschn. 5
+- [x] ✅ **24.11.2026:** TF3: 1 − Logit-Cosinus (Haupt), ΔP (Zweit), Quelle wie CAM, Gruppenvergleich beschreibend → Abschn. 7
+- [x] ✅ **24.11.2026:** Sonderfälle: Eigen-CAM ohne FP32-Ausrichtung (Flips + Sensitivität), Zeilen 3–4 bestätigt → Abschn. 8
+- [x] ✅ **24.11.2026:** Begründung 2.2 abgenommen (mit Nachträgen) → **alle Punkte entschieden**, Plan neu eingefroren (Tag `auswertungsplan-v1` neu gesetzt)
 - [x] **Umgang mit dem Emulator-Abstand bei MobileNetV3** ✅ **entschieden 09.11.2026 (Daniel):** Vorschlag unten übernommen → [[2026-11-09]]
   - Datenlage (Funktionstests, 200 Bilder, [[E2 Phase 1 Voraussetzungen]]): Emulator ↔ Chip Top-1 94,5 %, Eigen-CAM-IoU 0,937; Compile A ↔ B Top-1 90,5 %, IoU 0,915 → Emulator-Abstand etwas **kleiner** als die Compile-Streuung
   - **Vorschlag Claude (09.11.2026), von Daniel übernommen:** als Einschränkung berichten („Grad-CAM gilt für das emulierte Modell“) **und** im Kern Eigen-CAM Emulator ↔ Chip für alle k = 10 Compiles mitmessen, um den Abstand zu beziffern. Verworfene Alternative: Grad-CAM bei MobileNetV3 weglassen (schwächt die Arbeit; ohne Gradienten auf dem Chip gibt es keinen Weg ohne Emulator)
@@ -246,6 +284,8 @@ Zwei Böden zur Einordnung: **Zufallsboden** ≈ 0,081 (unabhängige Top-15 %-Ma
 
 ## Quellen
 
+- Dunn 1961, Multiple Comparisons Among Means (J. Am. Stat. Assoc. 56(293), 52–64): https://doi.org/10.1080/01621459.1961.10482090
+- Efron & Tibshirani 1993, An Introduction to the Bootstrap (Chapman & Hall), ⚠️ Kapitel noch nicht nachgeschlagen
 - Bylinskii et al. 2019, What do different evaluation metrics tell us about saliency models? (IEEE TPAMI): https://arxiv.org/abs/1604.03605
 
 - Nagel et al. 2021, A White Paper on Neural Network Quantization (arXiv, nicht peer-reviewed): https://arxiv.org/abs/2106.08295 (Abschn. 2.2, 3.1, 4.1 Gl. 36–37)
